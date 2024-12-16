@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Revive Command </title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', sans-serif;
+            line-height: 1.6;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        header img {
+            height: 112px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        pre {
+            background: #2c2c2c;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            color: #f77669;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        .note {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #ffcc00;
+            color: #000;
+            border-left: 5px solid #e6b800;
+        }
+        .tip {
+            background: #00ace6;
+            color: #fff;
+            border-left: 5px solid #007bb5;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #757575;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .menu a {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://cdn.discordapp.com/attachments/1292929222318231624/1318279986754490488/headlogo.png?ex=6761bf69&is=67606de9&hm=abf22b63a9e6402451c8bb78da3e6252066aea44b9fc186256fad3298f0da3d2&" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Teleport Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index.html">HOME</a>
+        <a href="#register-command">RegisterCommand</a>
+        <a href="#declare-player-id">Declare Player ID</a>
+        <a href="#triggering-events">Triggering Events</a>
+        <a href="#registering-client-event">Register Client Event</a>
+
+
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h3>A Step-by-Step Guide for Beginners</h3>
+        <p>This guide offers a straightforward breakdown of the script, highlighting its purpose and functionality. By the end, you'll not only understand <strong>how</strong> to use the script but also <strong>why</strong> each component is important. You'll gain the confidence to implement it and customize it for your FiveM server.</p>
+        
+        <p>Below, we will explain the core elements of the script step by step. Each part is described clearly, focusing on <strong>what</strong> it does, <strong>why</strong> it's necessary, and <strong>how</strong> it integrates into your server setup.</p>
+        
+        <h2 id="register-command">1.1 RegisterCommand</h2>
+        <p><strong>Introduction:</strong> This function creates a command that can be used by players in-game to trigger actions.</p>
+        <pre><code class="language-lua">
+RegisterCommand('revive', function(source, args)
+    -- here goes the code
+end)
+        </code></pre>
+        <ul>
+            <li><code>source</code>: ID of the player who executed the command.</li>
+            <li><code>args</code>: An array containing additional arguments passed with the command.</li>
+        </ul>
+
+        <h2 id="declare-player-id">1.2 Declare Player ID</h2>
+        <p><strong>Introduction:</strong> Now that we have the command, we need to declare a player ID. We can do this using the <code>tonumber</code> function:</p>
+        <ul>
+            <li id="code-explanation-registernetevent">
+                <strong>Code Explanation:</strong>
+                <p><strong>The <a href="https://docs.fivem.net/docs/scripting-reference/runtimes/lua/functions/RegisterNetEvent/">RegisterNetEvent()</a> function in FiveM</strong> allows developers to register custom events on the client or server side. These events are essential for enabling communication between the client and the server within the FiveM framework.</p>
+                <p>Once an event is registered, it can be triggered using <code>TriggerEvent</code> on the same side, or <code>TriggerClientEvent</code>/<code>TriggerServerEvent</code> for cross-side communication.</p>
+                <pre><code class="language-lua">
+RegisterNetEvent("myCustomEvent")
+
+AddEventHandler("myCustomEvent", function(data)
+    print("Event received with data: " .. data)
+end)
+                </pre></code>
+                <p>Security Note: Always validate input data and restrict unauthorized triggering of events to prevent exploits or abuse.</p>
+            </li>
+        </ul>        
+        <p>Now once we know how to declare a player ID, we can use it in our command:</p>
+        <pre><code class="language-lua">
+RegisterCommand('revive', function(source, args)
+    local target_id = tonumber(args[1]) -- Using the first argument as the player ID.
+end)
+        </code></pre>
+
+        <h2 id="triggering-events">1.3 Triggering Events</h2>
+        <p>Now we have the player ID, we can triggering events or functions. Here we are going to use <strong>RegisterNetEvent</strong> in both sides. First at the server, we will have:</p><p>
+        </p>
+        <pre><code class="language-lua">
+RegisterNetEvent("qs-university:server:revive")
+AddEventHandler("qs-university:server:revive", function(target_id)
+    local src = source -- source is the player who executed the command
+
+    if target_id and GetPlayerPing(target_id) > 0 then -- Check if the player ID is valid
+        TriggerClientEvent("qs-university:client:revive", target_id)
+        
+        ^ <u>Up here we trigger the client event. Not created yet</u>
+          <u>The target_id is the player ID passed in the command which we will use to trigger the client event</u>
+
+        print(string.format("The player [%s] has been revived by [%s].", target_id, src))
+        
+        ^ <u>Up here we add a debug message to the console. It will appear if the player ID is valid</u>
+    else
+        print(string.format("The player [%s] does not exist or is not connected.", target_id))
+
+        ^ <u>Up here we add a debug message to the console. It will appear if the player ID is not valid</u>
+    end
+end)
+        </code></pre>
+
+        <ul>
+            <li id="code-explanation-string-format">
+                <strong>Code Explanation:</strong>
+                <p><strong>The string.format() method in Lua</strong> is used to return a formatted string. It works similarly to `printf` in C, allowing you to format strings by specifying placeholders (e.g., `%s` for strings, `%d` for integers). This function is useful for creating dynamic messages or combining variables into a single string.</p>
+                <code class="language-lua">string.format("Hello, %s! You have %d new messages.", "John", 5)</code>
+            </li>            
+        </ul>
+
+        <h2 id="registering-client-event">1.4 Client Events</h2>
+        <p>Now we have the player ID, we can triggering events or functions. Here we are going to use <strong>RegisterNetEvent</strong> in both sides. First at the server, we will have:</p><p>
+        </p>
+        <pre><code class="language-lua">
+RegisterNetEvent("qs-university:client:revive")
+AddEventHandler("qs-university:client:revive", function()
+    local playerPed = PlayerPedId() -- Getting the player's ped
+
+    if IsEntityDead(playerPed) then -- Check if the player is dead
+        SetEntityHealth(playerPed, 200) -- Set the player's health to 200
+        ClearPedTasksImmediately(playerPed) -- Clear the player's tasks like animations
+
+        print("You have been revived.") -- Debug message in the console if the player is revived
+    end
+end)
+        </code></pre>
+        
+    </div>
+
+</body>
+</html>
