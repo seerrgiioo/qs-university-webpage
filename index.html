@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
     <title>Quasar University | Reference Grid</title>
+    <link rel="icon" type="image/x-icon" href="https://www.quasar-store.com/favicon.ico">
     <style>
         body {
             font-family: 'Cascadia Code', sans-serif;
@@ -79,11 +80,6 @@
             transform: scale(1.05);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
         }
-        d-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-        }
-
         footer {
             text-align: center;
             margin-top: 20px;
@@ -143,5 +139,46 @@
     </footer>
 
     <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <!-- Audio -->
+    <audio id="konami-audio" src="uhh.mp3" loop volume="0.3"></audio>
+
+    <script>
+        const konamiCode = [
+            "ArrowUp", "ArrowUp", 
+            "ArrowDown", "ArrowDown", 
+            "ArrowLeft", "ArrowRight", 
+            "ArrowLeft", "ArrowRight", 
+            "b", "a"
+        ];
+
+        let currentInput = [];
+
+        // Función para comprobar el código Konami
+        function checkKonamiCode(event) {
+            currentInput.push(event.key);
+            
+            // Mantener la longitud limitada al código Konami
+            if (currentInput.length > konamiCode.length) {
+                currentInput.shift();
+            }
+
+            // Comprobar si coincide
+            if (currentInput.join("") === konamiCode.join("")) {
+                playAudio();
+            }
+        }
+
+        // Reproducir la canción
+        function playAudio() {
+            const audio = document.getElementById("konami-audio");
+            audio.volume = 0.5;
+            audio.play();
+            alert("What's is this??");
+        }
+
+        // Evento para escuchar las teclas
+        window.addEventListener("keydown", checkKonamiCode);
+    </script>
 </body>
 </html>
