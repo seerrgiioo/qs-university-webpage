@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | FiveM Teleport Guide</title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', sans-serif;
+            line-height: 1.6;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        header img {
+            height: 112px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        pre {
+            background: #2c2c2c;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            color: #f77669;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        .note {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #ffcc00;
+            color: #000;
+            border-left: 5px solid #e6b800;
+        }
+        .tip {
+            background: #00ace6;
+            color: #fff;
+            border-left: 5px solid #007bb5;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #757575;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .menu a {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Teleport Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../">HOME</a>
+        <a href="#register-command">RegisterCommand</a>
+        <a href="#arrays-tables">Arrays & Tables</a>
+        <a href="#if-statements">Conditional Statements</a>
+        <a href="#set-entity-coords">SetEntityCoords</a>
+        <a href="#trigger-client-event">TriggerClientEvent</a>
+        <a href="#error-messages">Error Messages</a>
+        <a href="#full-script">Let's code!</a>
+        <a href="#beginner-example">Beginner example</a>
+        <a href="#advanced-example">Advanced example</a>
+        <a href="#testing">Final Steps</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h3>A Step-by-Step Guide for Beginners</h3>
+        <p>This guide provides a clear explanation of the script and its components, helping you understand not only <strong>how</strong> to use it, but also <strong>why</strong> each part is essential. By the end, you’ll be able to confidently implement this script and adapt it to your needs.</p>
+        
+        <p>In the following sections, we will break down the fundamental elements of the script. Each function and feature is explained in detail to ensure you grasp <strong>what</strong> it does, <strong>why</strong> it’s used, and <strong>how</strong> to implement it in your FiveM server.</p>
+        
+        <h2 id="register-command">1.1 RegisterCommand</h2>
+        <p><strong>Introduction:</strong> This function creates a command that can be used by players in-game to trigger actions.</p>
+        <pre><code class="language-lua">
+RegisterCommand('tpplayer', function(source, args)
+    -- Code executed when the command is used
+end)
+        </code></pre>
+        <ul>
+            <li><code>source</code>: ID of the player who executed the command.</li>
+            <li><code>args</code>: An array containing additional arguments passed with the command.</li>
+        </ul>
+
+        <h2 id="arrays-tables">1.2. Arrays and Tables</h2>
+        <p><strong>Purpose:</strong> Organizes multiple teleport locations for easier management and reference.</p>
+        <pre><code class="language-lua">
+local teleportLocations = {
+    { x = -75.0, y = -819.0, z = 326.0, name = "Main Rooftop" },
+    { x = -428.0, y = 1111.0, z = 327.0, name = "Vinewood" }
+}
+        </code></pre>
+        <ul>
+            <li><code>x, y, z</code>: Destination coordinates.</li>
+            <li><code>name</code>: A descriptive name for the location.</li>
+        </ul>
+
+        <h2 id="if-statements">1.3 Conditional Statements</h2>
+        <p><strong>Purpose:</strong> Validates input parameters to prevent errors.</p>
+        <pre><code class="language-lua">
+if targetId and locationIndex and teleportLocations[locationIndex] then
+    -- Execute teleport logic
+else
+    -- Show error message
+end
+        </code></pre>
+        <ul>
+            <li><code>targetId</code>: Ensures the player ID is valid.</li>
+            <li><code>locationIndex</code>: Checks if the location index exists.</li>
+            <li><code>teleportLocations[locationIndex]</code>: Validates the teleport location.</li>
+        </ul>
+
+        <div class="note warning">
+            ⚠️ <strong>Warning:</strong> Always validate input parameters to avoid script crashes or unexpected behavior.
+        </div>
+        <h2 id="set-entity-coords">1.4 SetEntityCoords</h2>       
+        <p><strong>Purpose:</strong> Moves the player to the specified coordinates.</p>
+        <pre><code class="language-lua">
+SetEntityCoords(PlayerPedId(), location.x, location.y, location.z, false, false, false, true)
+        </code></pre>
+        <ul>
+            <li><code>PlayerPedId()</code>: Retrieves the current player entity.</li>
+            <li><code>location.x, location.y, location.z</code>: Coordinates for the teleportation.</li>
+            <li><strong>Flags Explained:</strong>
+                <ul>
+                    <li><code>false</code>: No rotation around the X-axis.</li>
+                    <li><code>false</code>: No rotation around the Y-axis.</li>
+                    <li><code>false</code>: No rotation around the Z-axis.</li>
+                    <li><code>true</code>: Clears objects around the destination.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="trigger-client-event">1.5 TriggerClientEvent</h2>
+        <p><strong>Purpose:</strong> Sends an event from the server to a specific client.</p>
+        <pre><code class="language-lua">
+TriggerClientEvent('teleportPlayer', targetId, location)
+        </code></pre>
+        <ul>
+            <li><code>'teleportPlayer'</code>: Name of the custom event.</li>
+            <li><code>targetId</code>: Target player ID.</li>
+            <li><code>location</code>: Data passed to the client (destination).</li>
+        </ul>
+
+        <div class="note tip">
+            💡 <strong>Tip:</strong> Use descriptive event names to keep your code organized and understandable.
+        </div>
+        <h2 id="error-messages">1.6 Error Messages</h2>
+        <p><strong>Purpose:</strong> Notifies players of issues like invalid input.</p>
+        <pre><code class="language-lua">
+TriggerClientEvent('chat:addMessage', source, {
+    color = { 255, 0, 0 },
+    args = { "Error", "Invalid player ID or location index!" }
+})
+
+print("Position not valid! Use /tp [1-3].")
+        </code></pre>
+
+        <h2 id="full-script">2. Full Script Example</h2>
+        <p>This guide explains how to create a simple teleport script in <span class="important">LUA</span> for <span class="important">FiveM</span>, step by step.</p>
+        
+        <h2>2.1 fxmanifest.lua</h2>
+        <p>The <code>fxmanifest.lua</code> file is the entry point for your script. It tells the FiveM server how to handle your resource, even if it's a resource...</p>
+        <pre><code class="language-lua">
+fx_version 'cerulean'
+game 'gta5'
+
+name "kee_gan"
+description "quasar university - prologue"
+author "kee_ga"
+version "1.0.0"
+
+lua54 'yes'
+
+client_scripts {
+    'client/*.lua'
+}
+        </code></pre>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+            <li><code>fx_version</code>: Specifies the version of the FXServer.</li>
+            <li><code>client_scripts</code>: Indicates the files containing client-side code.</li>
+        </ul>
+        
+        <h2>2.2 client.lua</h2>
+        <h3 id="beginner-example" style="color: #00c2e0;">Beginner Section: Simple Teleport Script</h3>
+        <p>For beginners, this section focuses on the core teleportation functionality without advanced features like particle effects or validations.</p>
+<pre><code class="language-lua">
+-- Configuration for teleport locations
+local teleportLocations = {
+    { x = -75.0, y = -819.0, z = 326.0, name = "Main Rooftop" },
+    { x = -428.0, y = 1111.0, z = 327.0, name = "Vinewood" },
+    { x = 402.0, y = -996.0, z = -100.0, name = "Hidden Bunker" }
+}
+
+-- Register the /tp command
+RegisterCommand('tp', function(source, args)
+    local locationIndex = tonumber(args[1])
+    if locationIndex and teleportLocations[locationIndex] then
+        local location = teleportLocations[locationIndex]
+        SetEntityCoords(PlayerPedId(), location.x, location.y, location.z, false, false, false, true)
+        TriggerEvent('chat:addMessage', {
+            color = { 0, 255, 0 },
+            multiline = true,
+            args = { "Teleport", "You've been teleported in: " .. location.name }
+        })
+        print("You've been teleported in: " .. location.name)
+    else
+        TriggerEvent('chat:addMessage', {
+            color = { 255, 0, 0 },
+            multiline = true,
+            args = { "Error", "Position not valid! Use /tp [1-3]." }
+        })
+        print("Position not valid! Use /tp [1-3].")
+    end
+end)
+</code></pre>
+<p><strong>Explanation:</strong></p>
+<ul>
+    <li><code>RegisterCommand</code>: Registers the <code>/tp</code> command.</li>
+    <li><code>teleportLocations</code>: A list of teleport destinations with coordinates and names.</li>
+    <li><code>SetEntityCoords</code>: Teleports the player to the specified location.</li>
+</ul>
+
+<div class="note">
+    <strong>Tip:</strong> This simplified example is suitable for beginners. To add visual effects and advanced validation, see the advanced example below.
+</div>
+
+<h3 id="advanced-example" style="color: #00c2e0;">Advanced Section: Teleport Script with Visual Effects</h3>
+<p>For advanced users, this section introduces particle effects and additional validations. Ensure your game build supports these features.</p>
+<div class="note warning">
+    ⚠️ <strong>Disclaimer:</strong> This script requires <strong>Game Build 2372 or higher</strong> and additional configuration for effects like <code>StartParticleFxNonLoopedAtCoord</code>.
+</div>
+<pre><code class="language-lua">
+-- Configuration for teleport locations
+local teleportLocations = {
+    { x = -75.0, y = -819.0, z = 326.0, name = "Main Rooftop" },
+    { x = -428.0, y = 1111.0, z = 327.0, name = "Vinewood" },
+    { x = 402.0, y = -996.0, z = -100.0, name = "Hidden Bunker" }
+}
+
+-- Register the /tp command
+RegisterCommand('tp', function(source, args)
+    local locationIndex = tonumber(args[1])
+    if locationIndex and teleportLocations[locationIndex] then
+        local location = teleportLocations[locationIndex]
+        RequestNamedPtfxAsset("scr_rcbarry2")
+        while not HasNamedPtfxAssetLoaded("scr_rcbarry2") do
+            Citizen.Wait(0)
+        end
+        UseParticleFxAssetNextCall("scr_rcbarry2")
+        StartParticleFxNonLoopedAtCoord(
+            "scr_clown_appears",
+            GetEntityCoords(PlayerPedId()),
+            0.0, 0.0, 0.0,
+            1.0, false, false, false
+        )
+        SetEntityCoords(PlayerPedId(), location.x, location.y, location.z, false, false, false, true)
+        TriggerEvent('chat:addMessage', {
+            color = { 0, 255, 0 },
+            multiline = true,
+            args = { "Teleport", "You've been teleported in: " .. location.name }
+        })
+        print("You've been teleported in: " .. location.name)
+    else
+        TriggerEvent('chat:addMessage', {
+            color = { 255, 0, 0 },
+            multiline = true,
+            args = { "Error", "Position not valid! Use /tp [1-3]." }
+        })
+        print("Position not valid! Use /tp [1-3].")
+    end
+end)
+</code></pre>
+<p>Note: This script is compatible with <strong>Game Build 2372 or higher</strong>.</p>
+   
+        
+        <h3>Explanation:</h3>
+        <ul>
+            <li><code>RegisterCommand</code>: Registers the <code>/tp</code> command.</li>
+            <li><code>teleportLocations</code>: A list of teleport destinations with coordinates and names.</li>
+            <li><code>SetEntityCoords</code>: Teleports the player to the specified location.</li>
+            <li><code>StartParticleFxNonLoopedAtCoord</code>: Creates a visual effect during the teleport.</li>
+        </ul>
+        
+        <div class="note">
+            <strong>Tip:</strong> Customize the <code>teleportLocations</code> array to add your own destinations.
+        </div>
+        
+        <h2 id="testing">2.3 Testing & Result</h2>
+        <ol>
+            <li>Add the resource to your <code>server.cfg</code> with <code>ensure keegan_university_1</code>.</li>
+            <li>Start your FiveM server and join as a player.</li>
+            <li>Use the command <code>/tp 1</code> to teleport to the first location.</li>
+        </ol>
+        <div class="note tip">
+            💡 <strong>Tip:</strong> Always test your script on a local or test server before deploying it publicly to avoid errors.
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <video controls style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                <source src="video.mkv" type="video/mp4">
+                error.
+            </video>
+        </div>
+        
+        
+        <h2>Conclusion</h2>
+        <p>This script is a simple yet effective way to understand commands, player manipulation, and effects in FiveM scripting!</p> 
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Quasar University - All Rights Reserved</p>
+    </footer>
+</body>
+</html>
