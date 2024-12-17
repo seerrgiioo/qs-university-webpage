@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>    
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | NUI with Command </title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', sans-serif;
+            line-height: 1.6;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        header img {
+            height: 112px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        pre {
+            background: #2c2c2c;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            color: #f77669;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        .note {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #ffcc00;
+            color: #000;
+            border-left: 5px solid #e6b800;
+        }
+        .tip {
+            background: #00ace6;
+            color: #fff;
+            border-left: 5px solid #007bb5;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #757575;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .menu a {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Revive Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#register-command">RegisterCommand</a>
+        <a href="#create-nui">Create NUI</a>
+        <a href="#js-linking-client">JavaScript Linking (Client-Side)</a>
+        <a href="#test-final">Test Final</a>
+        <a href="./Fivem NUI Script Guide.rar" download>Download Resource</a>
+
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h3>A Step-by-Step Guide to Implement a Simple NUI (HTML UI) in FiveM</h3>
+        <p>
+            This guide will show you how to set up a basic NUI (Native User Interface) for your FiveM server.<br>
+            You'll learn how to connect <strong>Lua client commands</strong> with <strong>HTML UI, JavaScript logic, and CSS styling.</strong>
+        </p>
+    
+        <div>
+            <h2 id="client-command">1.1 Client-Side Command (Lua)</h2>
+            <p>The RegisterCommand> in Lua creates a command that can be executed in-game. Today we will use this command to open the NUI.</p>
+<pre><code class="language-lua">RegisterCommand('OpenNui', function()
+    SendNUIMessage({
+        action = "open"
+    })
+end)</code></pre> 
+            <p><b>What it Does:</b></p>
+            <ul>
+                <li><code>RegisterCommand</code>: Creates a custom command <code>/OpenNui</code> that players can use.</li>
+                <li><b>SendNUIMessage</b>: Sends data to the HTML interface. Here, it sends an action value <code>"open"</code> to tell the UI to appear.</li>
+            </ul>
+            <p>How it Works: When a player types <code>/OpenNui</code> in the game chat, the <code>SendNUIMessage</code> triggers the NUI to open.</p>
+            <p>
+                <a href="https://docs.fivem.net/docs/scripting-reference/runtimes/lua/functions/SendNUIMessage/" target="_blank"><b>Here</b></a>
+                you can see the <code>SendNUIMessage</code> function in the FiveM Documentation.
+            </p>
+        </div>
+    
+        <div>
+            <h2 id="create-nui">1.2 Creating the NUI (HTML UI)</h2>
+            <p>Now that we have the command, we need to create the NUI.</p>
+            <p>Open the <code>index.html</code> at <code>script/NUI/</code> and create the NUI with the code below:</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;link rel="stylesheet" href="style/nui.css"&gt;
+    &lt;title&gt;Quasar University | NUI &lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="main-container"&gt;
+        &lt;button id="open-nui"&gt;Open NUI&lt;/button&gt;
+
+        &lt;div id="nui-container"&gt;
+            &lt;h1&gt;Quasar University&lt;/h1&gt;
+            &lt;p&gt;&lt;u&gt;Welcome to Quasar University&lt;/u&gt;&lt;/p&gt;
+            &lt;button id="close-nui"&gt;Close NUI&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script src="script/nui.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+        <p> This code sets up the basic structure of the NUI. The <code>index.html</code> file contains the HTML structure, the <code>script/nui.js</code> file contains the JavaScript logic, and the <code>style/nui.css</code> file contains the CSS styling. </p>
+
+        </div>
+        <div>
+            <h2 id="js-linking-client">1.3 JavaScript Linking (Client-Side)</h2>
+            <p>To link the JavaScript file to the HTML, you need to add a <code>&lt;script&gt;</code> tag in the <code>index.html</code> file.</p>
+            <pre><code class="language-html">&lt;script src="script/nui.js"&gt;&lt;/script&gt;</code></pre>
+            <p><b>What it Does:</b></p>
+            <ul>
+                <li><code>src="script/nui.js"</code>: Specifies the path to the JavaScript file.</li>
+            </ul>
+            <p>How it Works: The JavaScript file is linked to the HTML, making it accessible for the client-side code to use.</p>
+            <p>Now you have the JavaScript file linked to the HTML, you can start working on the JavaScript code.</p>
+            <p>We receive the data from the SendNUIMessage using the <code>window.addEventListener('message', (event) => {</code></p>
+            <p>Here will see the code at JS:</p>
+<pre><code class="language-js">document.addEventListener('DOMContentLoaded', () => {
+
+    window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (typeof data !== 'object' || !data.action) return;
+    
+        
+        switch (data.action) {
+            case 'openNUI':
+                const openNUIButton = document.getElementById('open-nui');
+                openNUIButton.style.display = 'block';
+                break;
+        }
+    });
+    
+    // Get the elements
+    const openNUIButton = document.getElementById('open-nui');
+    const closeNUIButton = document.getElementById('close-nui');
+    const nuiContainer = document.getElementById('nui-container');
+
+    // Function to open the NUI
+    openNUIButton.addEventListener('click', () => {
+        nuiContainer.style.display = 'block';
+    });
+
+    // Function to close the NUI
+    closeNUIButton.addEventListener('click', () => {
+        nuiContainer.style.display = 'none';
+        openNUIButton.style.display = 'none';
+        fetch(`https://${GetParentResourceName()}/close`, { method: 'POST' });
+    });
+});</code></pre>
+            <p><b>What it Does:</b></p>
+<pre><code class="language-js"><code>document.addEventListener('DOMContentLoaded', () => {</code>: Listens for the DOM content to be loaded.
+<code>window.addEventListener('message', (event) => {</code>: Listens for messages from the client.
+
+<code>const data = event.data;</code>: Retrieves the data sent from the client.
+
+<code>if (typeof data !== 'object' || !data.type) return;</code>: Checks if the data is an object and has a type property.
+
+<code>switch (data.type) {</code>: Checks the type of the data.
+
+<code>case 'openNUI':</code>: Handles the 'openNUI' case.
+
+<code>openNUIButton.style.display = 'block';</code>: Shows the open NUI button.
+
+<code>break;</code>: Breaks out of the switch statement.</code></pre>
+        </div>
+        <div>
+            <h2 id="test-final">1.4 Test Final</h2>
+            <p>Here is the final test so you can see how this scripts is working:</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                    <source src="video.mkv" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

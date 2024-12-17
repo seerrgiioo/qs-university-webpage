@@ -188,7 +188,6 @@ end)
                 <p>Once an event is registered, it can be triggered using <code>TriggerEvent</code> on the same side, or <code>TriggerClientEvent</code>/<code>TriggerServerEvent</code> for cross-side communication.</p>
                 <pre><code class="language-lua">
 RegisterNetEvent("myCustomEvent")
-
 AddEventHandler("myCustomEvent", function(data)
     print("Event received with data: " .. data)
 end)
