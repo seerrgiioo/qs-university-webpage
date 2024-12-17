@@ -141,44 +141,54 @@
     <a href="#top" id="back-to-top" title="Back to Top">↑</a>
 
     <!-- Audio -->
-    <audio id="konami-audio" src="uhh.mp3" loop volume="0.3"></audio>
+   <!-- Audio -->
+<audio id="konami-audio" src="uhh.mp3" loop></audio>
+<audio id="university-audio" src="loud Israel music.mp3" loop></audio>
 
-    <script>
-        const konamiCode = [
-            "ArrowUp", "ArrowUp", 
-            "ArrowDown", "ArrowDown", 
-            "ArrowLeft", "ArrowRight", 
-            "ArrowLeft", "ArrowRight", 
-            "b", "a"
-        ];
+<script>
+    const konamiCode = [
+        "ArrowUp", "ArrowUp",
+        "ArrowDown", "ArrowDown",
+        "ArrowLeft", "ArrowRight",
+        "ArrowLeft", "ArrowRight",
+        "b", "a"
+    ];
 
-        let currentInput = [];
+    const universityCode = ["q", "u", "a", "s", "a", "r"];  
 
-        // Función para comprobar el código Konami
-        function checkKonamiCode(event) {
-            currentInput.push(event.key);
-            
-            // Mantener la longitud limitada al código Konami
-            if (currentInput.length > konamiCode.length) {
-                currentInput.shift();
-            }
+    let currentInput = [];
 
-            // Comprobar si coincide
-            if (currentInput.join("") === konamiCode.join("")) {
-                playAudio();
-            }
+    // Función general para verificar códigos
+    function checkCode(event) {
+        currentInput.push(event.key.toLowerCase());
+
+        // Mantener la longitud limitada al código más largo
+        const maxCodeLength = Math.max(konamiCode.length, universityCode.length);
+        if (currentInput.length > maxCodeLength) {
+            currentInput.shift();
         }
 
-        // Reproducir la canción
-        function playAudio() {
-            const audio = document.getElementById("konami-audio");
+        // Verificar códigos
+        if (currentInput.join("") === konamiCode.join("").toLowerCase()) {
+            playAudio("konami-audio", "What's this??");
+        } else if (currentInput.join("") === universityCode.join("").toLowerCase()) {
+            playAudio("university-audio", "You goat!");
+        }
+    }
+
+    // Función para reproducir audio
+    function playAudio(audioId, message) {
+        const audio = document.getElementById(audioId);
+        if (audio) {
             audio.volume = 0.5;
             audio.play();
-            alert("What's is this??");
+            alert(message);
         }
+    }
 
-        // Evento para escuchar las teclas
-        window.addEventListener("keydown", checkKonamiCode);
-    </script>
+    // Evento para escuchar las teclas
+    window.addEventListener("keydown", checkCode);
+</script>
+
 </body>
 </html>
