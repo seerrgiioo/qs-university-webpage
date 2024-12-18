@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>    
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="https://www.quasar-store.com/favicon.ico">
+    <title>Quasar University | NUI with Command </title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', sans-serif;
+            line-height: 1.6;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        header img {
+            height: 112px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+        }
+        header p {
+            margin: 5px 0 0;
+            font-size: 1.2em;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        pre {
+            background: #2c2c2c;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            color: #f77669;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        .note {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #ffcc00;
+            color: #000;
+            border-left: 5px solid #e6b800;
+        }
+        .tip {
+            background: #00ace6;
+            color: #fff;
+            border-left: 5px solid #007bb5;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #757575;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            .menu a {
+                font-size: 1em;
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM NUI Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#creating-loading-screen">Creating the Loading Screen</a>
+        <a href="#css-loading-screen">CSS Loading Screen</a>
+        <a href="#javascript-loading-screen">JavaScript Loading Screen</a>
+        <a href="#test-final">Final Test</a>
+        <a href="./FiveM Loadin Screen Example.zip" download>Download Resource</a>
+
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h3>A Step-by-Step Guide to Create a Simple Loading Screen in FiveM</h3>
+        <p>
+            This guide will show you how to create a basic loading screen for your FiveM server.<br>
+            You'll learn how to create a loading screen with HTML, CSS, and JavaScript.<br>
+            The loading screen will display a message and a progress bar.<br>
+        </p>
+
+        <div>
+            <h2 id="creating-loading-screen">1.1 Creating the Loading Screen</h2>
+            <p>First, let's create the HTML structure for our loading screen:</p>
+<pre><code class="language-html"    >&lt;head&gt;
+    &lt;link href="style.css" rel="stylesheet" type="text/css" /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div class="backdrop"&gt;
+        &lt;div class="main-container"&gt;
+            &lt;h2&gt;Server Name&lt;/h2&gt;
+            &lt;h3&gt;&lt;/h3&gt;
+            &lt;div class="loadbar"&gt;&lt;div class="loading-bar"&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="bottom"&gt;
+            &lt;div id="gradient"&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;</code></pre>
+        </div>
+        <p>At this point, you should have a basic HTML structure for your loading screen.
+            At head tag, we include the CSS file for styling. At body tag, we include the JavaScript file for the loading screen logic.
+        </p>
+    <div>
+        <h2 id="css-loading-screen">1.2 CSS Loading Screen</h2>
+        <p>Now, let's create the CSS styling for our loading screen. This will define the layout and appearance of the loading screen:</p>
+<pre><code class="language-css">body {
+    margin: 0px;
+    padding: 0px;
+}
+
+.backdrop
+{
+    position: relative;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+
+    background-image: url(background.webp);
+    background-size: 100% 100%;
+}
+
+.bottom
+{
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 100%;
+}
+
+#gradient
+{
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+
+    height: 25%;
+
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+}
+
+@font-face {
+    font-family: 'BankGothic';
+    src: url('bankgothic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1, h2 {
+    position: relative;
+    background: transparent;
+    z-index: 0;
+}
+
+
+.main-container
+{
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    bottom: 10%;
+
+    z-index: 5;
+
+    color: #fff;
+
+    font-family: "Segoe UI";
+}
+
+.main-container p
+{
+    font-size: 22px;
+
+    margin-left: 3px;
+
+    margin-top: 0px;
+}
+
+.main-container h2, .main-container h3
+{
+    font-family: BankGothic;
+
+    text-transform: uppercase;
+
+    font-size: 50px;
+
+    margin: 0px;
+
+    display: inline-block;
+}
+
+.loadbar
+{
+    width: 100%;
+    background-color: rgba(140, 140, 140, .9);
+    height: 20px;
+
+    margin-left: 2px;
+    margin-right: 3px;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    overflow: hidden;
+
+    position: relative;
+
+    display: block;
+}
+
+.loading-bar
+{
+    width: 10%;
+    background-color: #eee;
+    height: 20px;
+
+    position: absolute;
+    left: 10%;
+}</code></pre>
+        <p>We set the background image for the loading screen, define the layout and appearance of the loading screen elements, and set the font for the loading screen text.</p>
+    </div>
+    <div>
+        <h2 id="javascript-loading-screen">1.3 JavaScript Loading Screen</h2>
+        <p>Now, let's create the JavaScript logic for our loading screen. Since this is before the server has started, we need add the script to the HTML.</p>
+<pre><code class="language-javascript">var count = 0;
+var thisCount = 0;
+
+const emoji = {
+    INIT_BEFORE_MAP_LOADED: [ '🍉' ],
+    INIT_AFTER_MAP_LOADED: [ '🍋', '🍊' ],
+    INIT_SESSION: [ '🍐', '🍅', '🍆' ],
+};
+
+const handlers = {
+    startInitFunctionOrder(data)
+    {
+        count = data.count;
+
+        document.querySelector('.main-container h3').innerHTML += emoji[data.type][data.order - 1] || '';
+    },
+
+    initFunctionInvoking(data)
+    {
+        document.querySelector('.loading-bar').style.left = '0%';
+        document.querySelector('.loading-bar').style.width = ((data.idx / count) * 100) + '%';
+    },
+
+    startDataFileEntries(data)
+    {
+        count = data.count;
+
+        document.querySelector('.main-container h3').innerHTML += "\u{1f358}";
+    },
+
+    performMapLoadFunction(data)
+    {
+        ++thisCount;
+
+        document.querySelector('.loading-bar').style.left = '0%';
+        document.querySelector('.loading-bar').style.width = ((thisCount / count) * 100) + '%';
+    },
+
+};
+
+window.addEventListener('message', function(e)
+{
+    (handlers[e.data.eventName] || function() {})(e.data);
+});</code></pre>
+            
+
+        <p>We set the JavaScript logic for the loading screen. This includes handling events from the FiveM server and updating the loading screen elements accordingly.</p>
+        <p>FiveM has an entire docs page for this topic <a href="https://docs.fivem.net/docs/scripting-manual/nui-development/loading-screens/" target="_blank">here</a>. There you can see the documentation for the loading screen.</p>
+        <p>It includes the following events:</p>
+        <ul>
+            <li><code>Cursor/input</code> - You define this event in the <code>fxmanifest.lua</code> so the cursor can be enabled.</li>
+        </ul>
+
+        <p><strong>Handover data</strong></p>
+        <p>How it works: When a player connects, the playerConnecting event is triggered on the server. Within this event, the deferrals.handover function is used to send data to the client in the form of key-value pairs. For instance, the server can send the player's name using the GetPlayerName(source) function. 
+        This data is passed to the client seamlessly. Here you have an <strong>example:</strong></p>
+        <p style="color: #00c2e0;">! THIS IS ONLY A LITTLE EXPLANATION !</p>
+        <p><strong>At Client-Lua:</strong></p>
+<pre><code class="language-lua">AddEventHandler('playerConnecting', function(_, _, deferrals)
+    local source = source
+    deferrals.handover({
+        name = GetPlayerName(source)
+    })
+end)</code></pre>
+    <br>
+    <p><strong>At js:</strong></p>
+<pre><code class="language-javascript">&lt;!-- loading screen page --&gt;
+&lt;h1 id="namePlaceholder"&gt;Welcome, &lt;span&gt;&lt;/span&gt;&lt;/h1&gt;
+
+&lt;script type="text/javascript"&gt;
+window.addEventListener('DOMContentLoaded', () =&gt; {
+    console.log(`You are connecting to ${window.nuiHandoverData.serverAddress}`);
+
+    // Use innerText to safely display user-provided data
+    document.querySelector('#namePlaceholder &gt; span').innerText = window.nuiHandoverData.name;
+});
+&lt;/script&gt;</code></pre>
+
+    </div>
+    <div>
+        <h2 id="test-final">1.4 Test Final</h2>
+        <p>Here is the final test so you can see how this scripts is working:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                <source src="video.mkv" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
