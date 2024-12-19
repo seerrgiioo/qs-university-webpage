@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>    
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="https://www.quasar-store.com/favicon.ico">
+        <title>Quasar University | Ped System with Commands and SQL Query </title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', sans-serif;
+                line-height: 1.6;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px 0;
+                text-align: center;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            }
+            header img {
+                height: 112px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 2.5em;
+                letter-spacing: 0.05em;
+            }
+            header p {
+                margin: 5px 0 0;
+                font-size: 1.2em;
+            }
+            .container {
+                max-width: 1000px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            pre {
+                background: #2c2c2c;
+                padding: 10px;
+                border: 1px solid #444;
+                border-radius: 5px;
+                overflow-x: auto;
+            }
+            code {
+                color: #f77669;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            .note {
+                padding: 10px;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+            .warning {
+                background: #ffcc00;
+                color: #000;
+                border-left: 5px solid #e6b800;
+            }
+            .tip {
+                background: #00ace6;
+                color: #fff;
+                border-left: 5px solid #007bb5;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.9em;
+                color: #757575;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            @media (max-width: 768px) {
+                header h1 {
+                    font-size: 2em;
+                }
+                .menu a {
+                    font-size: 1em;
+                    margin: 0 10px;
+                }
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <img src="../headlogo.png" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Loading Screen Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#server-side-analysis">Server-Side Code</a>
+        <a href="#client-side-analysis">Client-Side Code</a>
+        <a href="#test-final">Test Final</a>
+        <a href="./FiveM SQL Test Example.zip" download>Download Resource</a>
+
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+
+    <div class="container">
+        <h2 id="introduction">1.1 Introduction</h2>
+        <p>This guide provides a highly detailed analysis of the Ped Management System script. Each part of the code is explained thoroughly, focusing on its purpose, functionality, and interaction with the rest of the system.</p>
+
+        <h2 id="server-side-analysis">1.2 Server-Side Code Analysis</h2>
+
+        <h3>1.2.1 Framework Detection</h3>
+        <pre><code class="language-lua">
+local Core = {}
+
+if Config.Framework == 'esx' then
+    ESX = exports['es_extended']:getSharedObject()
+elseif Config.Framework == 'qbcore' then
+    QBCore = exports['qb-core']:GetCoreObject()
+else
+    print("Error: Invalid Config.Framework value.")
+end
+        </code></pre>
+        <p><strong>Purpose:</strong></p>
+        <ul>
+            <li>To determine the framework the server is running (either ESX or QBCore).</li>
+            <li>It initializes the appropriate shared object, allowing interaction with the framework's core functions.</li>
+        </ul>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+            <li>The script depends on the `Config.Framework` variable. Ensure this is set correctly in the configuration file.</li>
+            <li>If neither framework is detected, an error message is logged, but the script will not halt execution.</li>
+        </ul>
+
+        <h3>1.2.2 Adding Peds</h3>
+        <pre><code class="language-lua">
+RegisterCommand('AddPeds', function(source, args)
+    if source == 0 then
+        print("This command cannot be run from the console.")
+        return
+    end
+
+    local TargetId = tonumber(args[1])
+    local PedName = args[2]
+    local PedModel = args[3]
+
+    if not TargetId or not PedName or not PedModel then
+        print("Usage: /AddPeds [TargetId] [PedName] [PedModel]")
+        return
+    end
+
+    local identifier = Core.GetPlayerIdentifier(TargetId)
+    if not identifier then
+        print("Error: Could not retrieve identifier for TargetId.")
+        return
+    end
+
+    MySQL.Async.execute('INSERT INTO test_peds (identifier, ped_name, ped_model) VALUES (@identifier, @ped_name, @ped_model)', {
+        ['@identifier'] = identifier,
+        ['@ped_name'] = PedName,
+        ['@ped_model'] = PedModel
+    }, function(rowsChanged)
+        if rowsChanged > 0 then
+            print("Ped added successfully.")
+        else
+            print("Error: Failed to add ped.")
+        end
+    end)
+end)
+        </code></pre>
+        <p><strong>Purpose:</strong></p>
+        <ul>
+            <li>Adds a ped entry to the database for a specific player.</li>
+        </ul>
+
+        <h3>1.2.3 Changing Peds</h3>
+        <pre><code class="language-lua">
+RegisterCommand('ChangePed', function(source, args)
+    if source == 0 then
+        print("This command cannot be run from the console.")
+        return
+    end
+
+    local PedName = args[1]
+
+    if not PedName then
+        print("Usage: /ChangePed [PedName]")
+        return
+    end
+
+    local identifier = Core.GetPlayerIdentifier(source)
+    if not identifier then
+        print("Error: Could not retrieve identifier for TargetId.")
+        return
+    end
+
+    MySQL.Async.fetchAll('SELECT ped_model FROM test_peds WHERE identifier = @identifier AND ped_name = @ped_name', {
+        ['@identifier'] = identifier,
+        ['@ped_name'] = PedName
+    }, function(result)
+        if result and #result > 0 then
+            TriggerClientEvent('test:client:ChangePlayerPed', source, result[1].ped_model)
+        else
+            print("Error: Ped not found for the given player and name.")
+        end
+    end)
+end)
+        </code></pre>
+        <p><strong>Purpose:</strong></p>
+        <ul>
+            <li>Changes the player's ped to the specified ped name.</li>
+        </ul>
+
+        <h2 id="client-side-analysis">1.3 Client-Side Code Analysis</h2>
+        <pre><code class="language-lua">
+local Test = {
+    Peds = {}
+}
+
+RegisterNetEvent('test:client:GetPlayerPeds')
+AddEventHandler('test:client:GetPlayerPeds', function(peds)
+    if not peds or #peds == 0 then
+        print("No peds found.")
+        return
+    end
+
+    for k, v in pairs(peds) do
+        print('Ped Name:' .. v.ped_name .. ' | Ped Model:' .. v.ped_model)
+    end
+end)
+
+RegisterNetEvent('test:client:ChangePlayerPed')
+AddEventHandler('test:client:ChangePlayerPed', function(ped_model)
+    print("Changing player ped to: " .. ped_model)
+    ChangePlayerPed(ped_model)
+end)
+
+function ChangePlayerPed(ped_model)
+    local hash = GetHashKey(ped_model)
+    RequestModel(hash)
+    while not HasModelLoaded(hash) do
+        Citizen.Wait(0)
+    end
+
+    SetPlayerModel(PlayerId(), hash)
+    SetPedDefaultComponentVariation(PlayerPedId())
+    SetModelAsNoLongerNeeded(hash)
+end
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>RegisterNetEvent `test:client:GetPlayerPeds`:</strong> Receives ped data from the server and prints it to the console.</li>
+            <li><strong>RegisterNetEvent `test:client:ChangePlayerPed`:</strong> Changes the player's ped model based on the data received from the server.</li>
+            <li><strong>ChangePlayerPed:</strong>
+                <ul>
+                    <li><code>GetHashKey:</code> Converts the ped model name into a hash key.</li>
+                    <li><code>RequestModel:</code> Ensures the ped model is loaded before applying it.</li>
+                    <li><code>SetPlayerModel:</code> Updates the player's character model.</li>
+                </ul>
+            </li>
+        </ul>
+        <div>
+            <h2 id="test-final">1.4 Test Final</h2>
+            <p>Here is the final test so you can see how this scripts is working:</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                    <source src="video.mkv" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>
