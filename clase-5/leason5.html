@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>    
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="https://www.quasar-store.com/favicon.ico">
+        <title>Quasar University | Ped System with Commands and SQL Query </title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', sans-serif;
+                line-height: 1.6;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px 0;
+                text-align: center;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            }
+            header img {
+                height: 112px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            header h1 {
+                margin: 0;
+                font-size: 2.5em;
+                letter-spacing: 0.05em;
+            }
+            header p {
+                margin: 5px 0 0;
+                font-size: 1.2em;
+            }
+            .container {
+                max-width: 1000px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            pre {
+                background: #2c2c2c;
+                padding: 10px;
+                border: 1px solid #444;
+                border-radius: 5px;
+                overflow-x: auto;
+            }
+            code {
+                color: #f77669;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            .note {
+                padding: 10px;
+                border-radius: 5px;
+                margin: 10px 0;
+            }
+            .warning {
+                background: #ffcc00;
+                color: #000;
+                border-left: 5px solid #e6b800;
+            }
+            .tip {
+                background: #00ace6;
+                color: #fff;
+                border-left: 5px solid #007bb5;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                font-size: 0.9em;
+                color: #757575;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+            @media (max-width: 768px) {
+                header h1 {
+                    font-size: 2em;
+                }
+                .menu a {
+                    font-size: 1em;
+                    margin: 0 10px;
+                }
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <img src="../headlogo.png" 
+             alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Simple Animation System Script Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#server-side">Server-Side Code</a>
+        <a href="#client-side">Client-Side Code</a>
+        <a href="#locales">Locales</a>
+        <a href="#howtouse">How to Use</a>
+        <a href="#test-final">Test Final</a>
+        <a href="./FiveM Animation Test Example.rar" download>Download Resource</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide explains how to create and use a FiveM Animation System that supports dynamic animations for players. 
+            Players can register animations with a unique name and play them later using simple commands.
+            The system supports two major frameworks: <strong>ESX</strong> and <strong>QBCore</strong>.
+        </p>
+
+        <h2 id="server-side">1.2. Server-Side Code</h2>
+        <h3>1.2.1 Framework Initialization</h3>
+        <pre><code class="language-lua">
+Core = {}
+
+if Config.Framework == 'esx' then
+    ESX = exports['es_extended']:getSharedObject()
+elseif Config.Framework == 'qbcore' then
+    QBCore = exports['qb-core']:GetCoreObject()
+end
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Initializes the server framework (ESX or QBCore) for use in the script.</li>
+            <li><strong>Key Points:</strong>
+                <ul>
+                    <li>The script checks the value of <code>Config.Framework</code> to determine which framework to use.</li>
+                    <li>Ensure the correct framework is set in the configuration file.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>1.2.2 Adding Animations</h3>
+        <pre><code class="language-lua">
+RegisterCommand('addAnim', function(source, args)
+    if source == 0 then
+        print(_U('console_error'))
+        return
+    end
+
+    local animName = args[1]
+    local dict = args[2]
+    local anim = args[3]
+
+    if not animName or not dict or not anim then
+        print(_U('usage_add'))
+        return
+    end
+
+    local identifier = Core.GetPlayerIdentifier(source)
+    if not identifier then
+        print("Error: Could not retrieve identifier.")
+        return
+    end
+
+    PlayerAnimations[identifier] = PlayerAnimations[identifier] or {}
+
+    if PlayerAnimations[identifier][animName] then
+        TriggerClientEvent('animation:client:notify', source, _U('anim_exists', animName))
+        return
+    end
+
+    PlayerAnimations[identifier][animName] = { dict = dict, anim = anim }
+    TriggerClientEvent('animation:client:notify', source, _U('anim_added', animName))
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Allows players to register custom animations with a unique name.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Validates the input arguments.</li>
+                    <li>Checks if the animation already exists for the player.</li>
+                    <li>Saves the animation data in memory.</li>
+                    <li>Notifies the player that the animation has been registered.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>1.2.3 Playing Animations</h3>
+        <pre><code class="language-lua">
+RegisterCommand('playAnim', function(source, args)
+    local animName = args[1]
+
+    if not animName then
+        print(_U('usage_play'))
+        return
+    end
+
+    local identifier = Core.GetPlayerIdentifier(source)
+    if not identifier then
+        print("Error: Could not retrieve identifier.")
+        return
+    end
+
+    if not PlayerAnimations[identifier] then
+        TriggerClientEvent('animation:client:notify', source, _U('no_anims'))
+        return
+    end
+
+    if PlayerAnimations[identifier][animName] then
+        local animation = PlayerAnimations[identifier][animName]
+        if animation.dict and animation.anim then
+            TriggerClientEvent('animation:client:play', source, animation)
+            TriggerClientEvent('animation:client:notify', source, _U('anim_play', animName))
+        else
+            TriggerClientEvent('animation:client:notify', source, "Invalid animation data.")
+        end
+    else
+        TriggerClientEvent('animation:client:notify', source, _U('anim_not_found', animName))
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Plays a previously registered animation for the player.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Validates the animation name.</li>
+                    <li>Checks if the animation exists for the player's identifier.</li>
+                    <li>Sends the animation data to the client for execution.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="client-side">1.3. Client-Side Code</h2>
+        <h3>1.3.1 Playing Animations</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('animation:client:play')
+AddEventHandler('animation:client:play', function(animation)
+    if not animation or not animation.dict or not animation.anim then
+        print("Invalid animation data received.")
+        return
+    end
+
+    local dict = animation.dict
+    local anim = animation.anim
+
+    RequestAnimDict(dict)
+    while not HasAnimDictLoaded(dict) do
+        Citizen.Wait(0)
+    end
+
+    ClearPedTasksImmediately(PlayerPedId())
+    TaskPlayAnim(PlayerPedId(), dict, anim, 8.0, -8.0, -1, 0, 0, false, false, false)
+    print("Playing animation: " .. dict .. " - " .. anim)
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Executes the animation received from the server.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Validates the received animation data.</li>
+                    <li>Requests the animation dictionary.</li>
+                    <li>Clears any current player tasks.</li>
+                    <li>Plays the animation using <code>TaskPlayAnim</code>.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>1.3.2 Notifications</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('animation:client:notify')
+AddEventHandler('animation:client:notify', function(message)
+    SetNotificationTextEntry("STRING")
+    AddTextComponentString(message)
+    DrawNotification(false, true)
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Displays a notification to the player with a given message.</li>
+        </ul>
+
+        <h2 id="locales">1.4. Locales</h2>
+        <p>The script supports multiple languages through a simple localization system. There's two supported languages with each file:</p>
+        <pre><code class="language-lua">
+    ['en'] = {
+        console_error = "This command cannot be run from the console.",
+        usage_add = "Usage: /addAnim [name] [dict] [anim]",
+        usage_play = "Usage: /playAnim [name]",
+        anim_exists = "The animation '%s' already exists.",
+        anim_added = "Animation '%s' has been added.",
+        anim_play = "Playing animation '%s'.",
+        anim_not_found = "Animation '%s' not found.",
+        no_anims = "You have no animations registered."
+    },
+    ['es'] = {
+        console_error = "Este comando no puede ejecutarse desde la consola.",
+        usage_add = "Uso: /addAnim [nombre] [dict] [anim]",
+        usage_play = "Uso: /playAnim [nombre]",
+        anim_exists = "La animación '%s' ya existe.",
+        anim_added = "Se ha añadido la animación '%s'.",
+        anim_play = "Reproduciendo animación '%s'.",
+        anim_not_found = "No se encontró la animación '%s'.",
+        no_anims = "No tienes animaciones registradas."
+    }
+        </code></pre>
+
+        <h2 id="howtouse">1.5. How to Use</h2>
+        <p>To test the system:</p>
+        <ol>
+            <li>Register an animation: <code>/addAnim wave anim@mp_player_intcelebrationmale wave</code></li>
+            <li>Play the animation: <code>/playAnim wave</code></li>
+            <li>Switch languages and try again to ensure localization works.</li>
+        </ol>
+        <div>
+            <h2 id="test-final">1.6 Test Final</h2>
+            <p>Here is the final test so you can see how this scripts is working:</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                    <source src="video.mkv" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Quasar University - FiveM Animation System Guide</p>
+    </footer>
+</body>
+</html>
