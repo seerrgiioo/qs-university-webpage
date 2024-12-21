@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <title>Quasar University | Trade System Guide</title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <img src="logo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Trade System Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#server-side">Server-Side Code</a>
+        <a href="#client-side">Client-Side Code</a>
+        <a href="#html-css-js">HTML, CSS & JavaScript</a>
+        <a href="#locales">Locales</a>
+        <a href="#configuration">Configuration</a>
+        <a href="#testing">Testing the System</a>
+        <a href="#test-final">Test Final</a>
+        <a href="./FiveM Trade System Test Example.zip" download>Download Resource</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide explains the functionality and implementation of a Trade System in FiveM. The system allows players to send and accept trade requests for items using an interactive menu. It supports multiple frameworks and inventory systems.
+        </p>
+
+        <h2 id="server-side">2. Server-Side Code</h2>
+        <h3>2.1 Trade Request Command</h3>
+        <pre><code class="language-lua">
+RegisterCommand('tradeRequest', function(source, args)
+    local targetId = tonumber(args[1])
+    local itemName = args[2]
+    local itemCount = tonumber(args[3])
+
+    if not targetId or not itemName or not itemCount or itemCount <= 0 then
+        TriggerClientEvent('trade:client:notify', source, _U('usage_trade_request'))
+        return
+    end
+
+    TriggerClientEvent('trade:client:receiveRequest', targetId, source, itemName, itemCount)
+    TriggerClientEvent('trade:client:notify', source, string.format(_U('trade_request_sent'), targetId))
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Sends a trade request to another player.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Validates the command input.</li>
+                    <li>Sends a trade request to the target player.</li>
+                    <li>Notifies the requester that the request was sent.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>2.2 Confirming Trades</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('trade:server:confirmTrade')
+AddEventHandler('trade:server:confirmTrade', function(sourcePlayer, itemName, itemCount)
+    local source = source
+    local targetPlayer = sourcePlayer
+
+    if HasItem(targetPlayer, itemName, itemCount) then
+        RemoveItem(targetPlayer, itemName, itemCount)
+        GiveItem(source, itemName, itemCount)
+        TriggerClientEvent('trade:client:notify', targetPlayer, _U('trade_success'))
+        TriggerClientEvent('trade:client:notify', source, _U('trade_received'))
+    else
+        TriggerClientEvent('trade:client:notify', source, _U('trade_failed'))
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Confirms a trade and transfers items between players.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Checks if the target player has enough items.</li>
+                    <li>Transfers the items if conditions are met.</li>
+                    <li>Notifies both players about the trade outcome.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>2.3 Inventory Functions</h3>
+        <p>These functions interact with different inventory systems to handle items during trades.</p>
+        <pre><code class="language-lua">
+function HasItem(playerId, itemName, itemCount)
+    -- Checks if the player has the required items
+end
+
+function RemoveItem(playerId, itemName, itemCount)
+    -- Removes items from the player's inventory
+end
+
+function GiveItem(playerId, itemName, itemCount)
+    -- Adds items to the player's inventory
+end
+        </code></pre>
+        <p>Each function supports multiple inventory systems, such as ESX, QB, QS, and OX.</p>
+        <h2 id="client-side">3. Client-Side Code</h2>
+        <h3>3.1 Receiving Trade Requests</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('trade:client:receiveRequest')
+AddEventHandler('trade:client:receiveRequest', function(requesterId, itemName, itemCount)
+    TriggerEvent('trade:client:showMenu', requesterId, itemName, itemCount)
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Listens for trade requests sent by the server.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Receives the trade request data from the server.</li>
+                    <li>Triggers the event <code>trade:client:showMenu</code> to display the trade menu.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>3.2 Displaying the Trade Menu</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('trade:client:showMenu')
+AddEventHandler('trade:client:showMenu', function(requesterId, itemName, itemCount)
+    SetNuiFocus(true, true)
+    SendNUIMessage({
+        action = 'showMenu',
+        requesterId = requesterId,
+        itemName = itemName,
+        itemCount = itemCount
+    })
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Opens the NUI menu and sends the trade data to the frontend.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Enables NUI focus with <code>SetNuiFocus</code>.</li>
+                    <li>Sends the trade details (player ID, item name, item count) to the JavaScript frontend via <code>SendNUIMessage</code>.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>3.3 Confirming the Trade</h3>
+        <pre><code class="language-lua">
+RegisterNUICallback('acceptRequest', function(data, cb)
+    TriggerServerEvent('trade:server:confirmTrade', data.playerId, data.itemName, data.itemCount)
+    cb({ success = true })
+    SetNuiFocus(false, false)
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Sends the player's acceptance of the trade to the server.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Extracts the trade details from the NUI callback data.</li>
+                    <li>Sends the trade confirmation to the server using <code>TriggerServerEvent</code>.</li>
+                    <li>Disables the NUI focus to close the menu.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>3.4 Notifications</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('trade:client:notify')
+AddEventHandler('trade:client:notify', function(message)
+    SetNotificationTextEntry("STRING")
+    AddTextComponentString(message)
+    DrawNotification(false, true)
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Displays notifications on the player's screen.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Uses the game's notification system to display messages sent from the server.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="html-css-js">4. HTML, CSS & JavaScript</h2>
+        <h3>4.1 HTML</h3>
+<pre><code class="language-html">&lt;div id="RequestTradeMenu" style="display: none;"&gt;
+    &lt;div id="RequestTradeMenuTitle"&gt;
+        &lt;h1&gt;Request Trade&lt;/h1&gt;
+    &lt;/div&gt;
+    &lt;div id="RequestTradeMenuContent"&gt;
+        &lt;input id="RequestTradeMenuPlayerId" type="text" placeholder="Player ID" /&gt;
+        &lt;input id="RequestTradeMenuItemName" type="text" placeholder="Item Name" /&gt;
+        &lt;input id="RequestTradeMenuItemCount" type="number" placeholder="Item Count" /&gt;
+        &lt;button id="AcceptTradeButton"&gt;Accept Trade&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>            
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Defines the structure of the trade request menu.</li>
+            <li><strong>Components:</strong>
+                <ul>
+                    <li><code>#RequestTradeMenu</code>: Container for the entire menu.</li>
+                    <li><code>#RequestTradeMenuContent</code>: Inputs for player ID, item name, and item count, along with the accept button.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>4.2 CSS</h3>
+        <pre><code class="language-css">
+#RequestTradeMenu {
+    width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #1e1e2f, #252540);
+    border-radius: 8px;
+    color: #fff;
+    text-align: center;
+}
+#RequestTradeMenu input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 4px;
+    background: #2c2c3e;
+    color: #fff;
+}
+#AcceptTradeButton {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    background: #00aaff;
+    color: #fff;
+    cursor: pointer;
+}
+#AcceptTradeButton:hover {
+    background: #007acc;
+}
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Provides the styling for the trade request menu.</li>
+            <li><strong>Key Elements:</strong>
+                <ul>
+                    <li><code>#RequestTradeMenu</code>: Styles the main menu container.</li>
+                    <li><code>#AcceptTradeButton</code>: Adds hover effects for the accept button.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>4.3 JavaScript</h3>
+        <pre><code class="language-javascript">
+window.addEventListener('message', (event) => {
+    const data = event.data;
+    if (data.action === 'showMenu') {
+        ShowRequestEventMenu(data.requesterId, data.itemName, data.itemCount);
+    }
+});
+
+function ShowRequestEventMenu(requesterId, itemName, itemCount) {
+    const menu = document.getElementById('RequestTradeMenu');
+    menu.style.display = 'block';
+
+    document.getElementById('RequestTradeMenuPlayerId').value = requesterId;
+    document.getElementById('RequestTradeMenuItemName').value = itemName;
+    document.getElementById('RequestTradeMenuItemCount').value = itemCount;
+}
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Handles the interaction between the game and the HTML menu.</li>
+            <li><strong>Steps:</strong>
+                <ul>
+                    <li>Listens for the <code>showMenu</code> action from the Lua client.</li>
+                    <li>Populates the menu fields with the received data and displays the menu.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="locales">5. Locales</h2>
+        <pre><code class="language-lua">
+Locales = {
+    ['en'] = {
+        usage_trade_request = "Usage: /tradeRequest [playerId] [itemName] [itemCount]",
+        trade_request_sent = "Trade request sent to player %s.",
+        trade_success = "Trade completed successfully!",
+        trade_received = "You have received items from the trade.",
+        trade_failed = "Trade failed. Check the item quantity.",
+    },
+    ['es'] = {
+        usage_trade_request = "Uso: /tradeRequest [playerId] [itemName] [itemCount]",
+        trade_request_sent = "Solicitud de intercambio enviada al jugador %s.",
+        trade_success = "¡Intercambio completado con éxito!",
+        trade_received = "Has recibido artículos del intercambio.",
+        trade_failed = "El intercambio falló. Verifica la cantidad de los artículos.",
+    }
+}
+        </code></pre>
+        <p><strong>Explanation:</strong> Localized messages allow the script to support multiple languages, enhancing accessibility.</p>
+
+        <h2 id="configuration">6. Configuration</h2>
+        <pre><code class="language-lua">
+Config = {
+    Locale = 'en', -- Default language
+    Inventory = 'qs', -- Inventory system ('esx', 'qs', 'ox', 'qb')
+    Framework = 'esx' -- Framework ('esx', 'qb')
+}
+        </code></pre>
+        <p><strong>Explanation:</strong> Configurable settings allow the script to adapt to different server environments.</p>
+
+        <h2 id="testing">7. Testing the System</h2>
+        <p>Follow these steps to test the system:</p>
+        <ol>
+            <li>Send a trade request: <code>/tradeRequest [targetId] [itemName] [itemCount]</code>.</li>
+            <li>Accept the trade through the menu.</li>
+            <li>Check the inventories of both players to ensure the items were transferred.</li>
+        </ol>
+        <div>
+            <h2 id="test-final">8. Test Final</h2>
+            <p>Here is the final test so you can see how this scripts is working:</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                    <source src="video.mkv" type="video/mp4">
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Quasar University - FiveM Trade System Guide</p>
+    </footer>
+</body>
+</html>
