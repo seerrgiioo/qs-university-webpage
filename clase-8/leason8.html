@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Banking System Comprehensive Guide</title>
+    <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png">
+        <h1>Quasar University</h1>
+        <p>FiveM Banking System Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="#introduction">Introduction</a>
+        <a href="#server-side">Server-Side Code</a>
+        <a href="#client-side">Client-Side Code</a>
+        <a href="#frontend-integration">Frontend Integration</a>
+        <a href="#config">Configuration</a>
+        <a href="#testing">Testing</a>
+        <a href="./FiveM Loops Threads and Client-Server Communication.zip" download>Download Resource</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>Welcome to the advanced scripting guide from Quasar University. This document is a step-by-step walkthrough on using loops, threads, and client-server communication effectively in FiveM scripting. Each exercise is carefully designed to simulate practical use cases that you can incorporate into your own projects.</p>
+
+        <h2 id="exercise1">Exercise 1: Create a Loop with Pauses</h2>
+        <p><strong>Objective:</strong> Write a thread that continuously prints "Hello, FiveM!" in the console with a delay of 3 seconds. This will teach you the basics of <code>Citizen.CreateThread</code> and how to control execution intervals using <code>Citizen.Wait</code>.</p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        print("Hello, FiveM!")
+        Citizen.Wait(3000) -- Wait 3 seconds
+    end
+end)
+        </code></pre>
+        <p><strong>Detailed Explanation:</strong></p>
+        <ul>
+            <li><strong>Citizen.CreateThread:</strong> Creates a new thread that runs independently of other game processes.</li>
+            <li><strong>print:</strong> Outputs text to the server or client console, useful for debugging or simple output.</li>
+            <li><strong>Citizen.Wait:</strong> Pauses the thread for a specified duration (in milliseconds). Adjusting this value directly impacts performance and output frequency.</li>
+        </ul>
+
+        <h2 id="exercise2">Exercise 2: Detect Proximity with Conditions</h2>
+        <p><strong>Objective:</strong> Create a thread that continuously checks if the player is within 10 units of a specific location. Adjust the delay dynamically based on proximity.</p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 500
+        local playerCoords = GetEntityCoords(PlayerPedId())
+        local targetCoords = vector3(100.0, 200.0, 20.0)
+
+        if #(playerCoords - targetCoords) < 10.0 then
+            print("Near the target")
+            sleep = 100
+        else
+            print("Far from the target")
+        end
+
+        Citizen.Wait(sleep)
+    end
+end)
+        </code></pre>
+        <p><strong>Detailed Explanation:</strong></p>
+        <ul>
+            <li><strong>GetEntityCoords:</strong> Retrieves the current coordinates of the specified entity. In this case, the player's ped is used.</li>
+            <li><strong>vector3:</strong> Represents a 3D point in the game world, used to define the target location.</li>
+            <li><strong>#:</strong> Computes the distance between two vectors. In this example, it checks the proximity between the player and the target.</li>
+            <li><strong>Dynamic Sleep:</strong> Reduces resource usage by increasing the delay when the player is far from the target.</li>
+        </ul>
+        <h2 id="exercise3">Exercise 3: Implementing a Timer</h2>
+        <p><strong>Objective:</strong> Create a timer that counts down from 30 seconds, displaying the remaining time in the console each second.</p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    local countdown = 30
+    while countdown > 0 do
+        print("Time remaining: " .. countdown .. " seconds")
+        Citizen.Wait(1000) -- Wait 1 second
+        countdown = countdown - 1
+    end
+    print("Countdown finished!")
+end)
+        </code></pre>
+        <p><strong>Detailed Explanation:</strong></p>
+        <ul>
+            <li><strong>Countdown Variable:</strong> Holds the remaining time and is decremented with each iteration.</li>
+            <li><strong>Citizen.Wait:</strong> Ensures the loop runs every second, creating a precise timer.</li>
+            <li><strong>End Condition:</strong> The loop terminates when <code>countdown</code> reaches 0, preventing infinite execution.</li>
+        </ul>
+
+        <h2 id="exercise4">Exercise 4: Client-Server Communication</h2>
+        <p><strong>Objective:</strong> Learn how to send data between the client and the server using FiveM's event system.</p>
+        <h3>Server Code:</h3>
+        <pre><code class="language-lua">
+RegisterNetEvent('example:server:receiveMessage')
+AddEventHandler('example:server:receiveMessage', function(message)
+    print("Received message from client: " .. message)
+    TriggerClientEvent('example:client:receiveResponse', source, "Message received: " .. message)
+end)
+        </code></pre>
+        <h3>Client Code:</h3>
+        <pre><code class="language-lua">
+RegisterCommand('sendmessage', function(source, args)
+    local message = table.concat(args, " ")
+    if message ~= "" then
+        TriggerServerEvent('example:server:receiveMessage', message)
+    else
+        print("Please provide a message to send.")
+    end
+end)
+
+RegisterNetEvent('example:client:receiveResponse')
+AddEventHandler('example:client:receiveResponse', function(response)
+    print("Response from server: " .. response)
+end)
+        </code></pre>
+        <p><strong>Detailed Explanation:</strong></p>
+        <ul>
+            <li><strong>TriggerServerEvent:</strong> Sends data from the client to the server.</li>
+            <li><strong>TriggerClientEvent:</strong> Sends data back to the client from the server, optionally targeting specific players.</li>
+            <li><strong>Dynamic Communication:</strong> The client sends a message to the server, which processes and returns a response.</li>
+        </ul>
+
+        <h2 id="exercise5">Exercise 5: Loop with State Control</h2>
+        <p><strong>Objective:</strong> Build a loop that toggles its behavior based on a global state variable. Use a command to control the state.</p>
+        <pre><code class="language-lua">
+local isActive = false
+
+RegisterCommand('toggleloop', function()
+    isActive = not isActive
+    print("Loop is now " .. (isActive and "active" or "inactive"))
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        if isActive then
+            print("The loop is running.")
+        end
+        Citizen.Wait(1000)
+    end
+end)
+        </code></pre>
+        <p><strong>Detailed Explanation:</strong></p>
+        <ul>
+            <li><strong>Global State Variable:</strong> Controls whether the loop's logic is executed.</li>
+            <li><strong>RegisterCommand:</strong> Adds a command that toggles the state variable.</li>
+            <li><strong>Conditional Logic:</strong> The loop checks the state before executing its code, adding flexibility.</li>
+        </ul>
+
+        <h2 id="testing">6. Testing and Debugging</h2>
+        <p><strong>Steps to Test:</strong></p>
+        <ul>
+            <li>Start your FiveM server and ensure the resources are loaded without errors.</li>
+            <li>Use the command <code>/toggleloop</code> to activate the state-controlled loop and verify its functionality in the console.</li>
+            <li>Test the communication example by using <code>/sendmessage [your_message]</code>.</li>
+            <li>Verify the countdown timer and proximity detection by monitoring the console outputs.</li>
+        </ul>
+        <p>Debugging tips include:</p>
+        <ul>
+            <li>Using <code>print</code> statements liberally to verify data and flow.</li>
+            <li>Checking server logs for errors in event registration or callback execution.</li>
+            <li>Ensuring proper synchronization between client and server scripts.</li>
+        </ul>
+        <h2 id="test-final">8. Test Final</h2>
+        <p>Here is the final test so you can see how this scripts is working:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <video controls controlsList="nodownload" style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);">
+                <source src="video.mkv" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</body>
+</html>
