@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <title>Quasar University | Loops and Threads Guide</title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>FiveM Loops and Threads Guide</p>
+    </header>
+
+    <nav class="menu">
+        <a href="#introduction">Introduction</a>
+        <a href="#citizen-thread">Citizen and Threads</a>
+        <a href="#common-loops">Common Loops</a>
+        <a href="#optimized-loops">Optimized Loops</a>
+        <a href="#tips">Tips for Efficiency</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide explains the concepts of loops and threads in FiveM scripting, providing practical examples for using `Citizen.CreateThread` and loops to handle background tasks in your scripts efficiently. In FiveM, loops are commonly used for continuously checking conditions or handling real-time updates without blocking other parts of the script.
+        </p>
+
+        <h2 id="citizen-thread">2. What is Citizen and CreateThread?</h2>
+        <p>
+            FiveM provides the <code>Citizen</code> namespace to control timing and threading. The function <code>Citizen.CreateThread</code> allows you to run code continuously without blocking other parts of your script.
+        </p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        print("This message appears every second")
+        Citizen.Wait(1000) -- Pause for 1 second (1000 ms)
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> The `Citizen.CreateThread` function is used to create a non-blocking thread that runs independently of other threads.</li>
+            <li><strong>Details:</strong> 
+                <ul>
+                    <li><code>while true</code>: Ensures that the code inside the loop runs indefinitely.</li>
+                    <li><code>Citizen.Wait(1000)</code>: Introduces a pause of 1 second between iterations, preventing the loop from overwhelming the CPU.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="common-loops">3. Common Loop Types</h2>
+        <h3>3.1 While Loop</h3>
+        <p>
+            A <strong>while loop</strong> continuously runs as long as its condition is true. It is ideal for tasks that need to persist over time, like monitoring a player's actions or checking their proximity to certain objects.
+        </p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    local active = true
+    while active do
+        print("Loop is running")
+        Citizen.Wait(1000)
+        if math.random(1, 10) == 5 then
+            print("Exiting the loop")
+            active = false
+        end
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> This loop runs while the <code>active</code> variable is true.</li>
+            <li><strong>Example Use Case:</strong> Useful for monitoring events that can be terminated when a specific condition is met (e.g., a timer running down).</li>
+        </ul>
+
+        <h3>3.2 Repeat Loop</h3>
+        <p>
+            A <strong>repeat loop</strong> always executes at least once before checking its condition. It is suitable for scenarios where you need to guarantee that a block of code runs at least once.
+        </p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    local counter = 0
+    repeat
+        print("This will run at least once")
+        Citizen.Wait(1000)
+        counter = counter + 1
+    until counter == 5
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Ensures that the loop runs at least once, even if the condition is initially false.</li>
+            <li><strong>Example Use Case:</strong> Handling initialization logic that should execute once before entering a conditional loop.</li>
+        </ul>
+
+        <h2 id="optimized-loops">4. Optimized Loops with Dynamic Sleep</h2>
+        <p>
+            Use dynamic sleep times to adjust loop frequency based on context, improving performance. This technique is essential in FiveM scripts to ensure that the game runs smoothly, especially on servers with multiple players.
+        </p>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 500 -- Default wait time
+        local player = PlayerPedId()
+        local coords = GetEntityCoords(player)
+        local targetCoords = vector3(100.0, 200.0, 20.0)
+
+        if #(coords - targetCoords) < 10.0 then
+            print("Near target")
+            sleep = 100
+        end
+
+        Citizen.Wait(sleep)
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Adjusts the frequency of loop execution based on player proximity to a target location.</li>
+            <li><strong>Details:</strong> 
+                <ul>
+                    <li><code>sleep = 500</code>: Default wait time for performance optimization.</li>
+                    <li><code>#(coords - targetCoords) < 10.0</code>: Calculates the distance between the player and a target point.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="tips">5. Tips for Efficiency</h2>
+        <ul>
+            <li>Always include <code>Citizen.Wait</code> to prevent CPU overuse.</li>
+            <li>Stop loops when they are no longer needed to free resources.</li>
+            <li>Use dynamic sleep times to optimize performance for different scenarios.</li>
+            <li>Document your loops to ensure maintainability and clarity for future updates.</li>
+        </ul>
+    </div>
+
+    <footer>
+        <p>Quasar University - FiveM Loops and Threads Guide</p>
+    </footer>
+</body>
+</html>
