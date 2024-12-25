@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <title>Quasar University | FiveM Loops, Threads, and Optimization</title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+        </style>
+    </head>
+<body>
+    <header>
+        <img src="logo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Comprehensive Guide to FiveM Loops, Threads, and Optimization</p>
+    </header>
+
+    <nav class="menu">
+        <a href="#introduction">Introduction</a>
+        <a href="#lua-basics">Lua Basics</a>
+        <a href="#threads">Threads in FiveM</a>
+        <a href="#timers">Timers and Stopwatches</a>
+        <a href="#client-server">Client-Server Communication</a>
+        <a href="#debugging">Debugging and Testing</a>
+        <a href="#optimization">Optimization Techniques</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            In FiveM scripting, loops and threads play a crucial role in real-time gameplay logic. Understanding these concepts is essential for creating efficient and responsive scripts. This guide will cover:
+        </p>
+        <ul>
+            <li>What loops and threads are in FiveM scripting.</li>
+            <li>Best practices for optimizing script performance.</li>
+            <li>Debugging techniques to identify performance bottlenecks.</li>
+        </ul>
+
+        <h2 id="lua-basics">2. Lua Basics</h2>
+        <h3>2.1 Variables</h3>
+        <pre><code class="language-lua">
+local playerName = "John" -- Local variable, scoped to the function
+globalName = "Admin" -- Global variable, accessible across all scripts
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Local Variables:</strong> These are limited to the current function or block, improving performance and avoiding conflicts with other scripts.</li>
+            <li><strong>Global Variables:</strong> Accessible from anywhere, but they can cause issues if not handled carefully.</li>
+        </ul>
+
+        <h3>2.2 Tables</h3>
+        <pre><code class="language-lua">
+local player = {
+    name = "John",
+    health = 100,
+    inventory = {"pistol", "ammo"}
+}
+print(player.name) -- Output: John
+        </code></pre>
+        <p><strong>Explanation:</strong> Tables are versatile data structures in Lua, used for arrays, dictionaries, or even object-like structures. They are commonly employed in FiveM to store player or vehicle data.</p>
+
+        <h2 id="threads">3. Threads in FiveM</h2>
+        <h3>3.1 What is a Thread?</h3>
+        <p>A thread is a sequence of instructions that can run independently, allowing multitasking within your script.</p>
+        <h3>3.2 Citizen.CreateThread</h3>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        print("Running thread every second")
+        Citizen.Wait(1000) -- Pause for 1 second
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><strong>Purpose:</strong> Create a non-blocking thread that continuously performs a task without interfering with other parts of the script.</li>
+            <li><strong>Best Practices:</strong>
+                <ul>
+                    <li>Always include <code>Citizen.Wait</code> to prevent CPU overload.</li>
+                    <li>Stop the thread when it's no longer needed.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="timers">4. Timers and Stopwatches</h2>
+        <h3>4.1 Using Timers</h3>
+        <pre><code class="language-lua">
+local startTime = os.time()
+Citizen.Wait(5000) -- Wait 5 seconds
+local elapsedTime = os.time() - startTime
+print("Elapsed time: " .. elapsedTime .. " seconds")
+        </code></pre>
+        <p><strong>Explanation:</strong> Lua’s <code>os.time()</code> function is ideal for creating timers. In this example, the elapsed time is calculated after a delay.</p>
+
+        <h2 id="client-server">5. Client-Server Communication</h2>
+        <h3>5.1 Event Basics</h3>
+        <pre><code class="language-lua">
+-- Client to Server
+TriggerServerEvent("myServerEvent", data)
+
+-- Server to Client
+TriggerClientEvent("myClientEvent", targetPlayer, data)
+        </code></pre>
+        <p><strong>Explanation:</strong> Events enable synchronization between the client and server, ensuring gameplay logic is consistent across all players.</p>
+    </div>
+
+    <footer>
+        <p>Quasar University - Comprehensive Guide to FiveM Scripting</p>
+    </footer>
+</body>
+</html>
