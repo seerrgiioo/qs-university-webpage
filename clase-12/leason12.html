@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <title>Quasar University | Optimizing Threads with Sleep</title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+    </style>
+    </head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Optimizing Threads in FiveM</p>
+    </header>
+
+    <nav class="menu">
+        <a href="#introduction">Introduction</a>
+        <a href="#what-is-citizen-wait">What is Citizen.Wait?</a>
+        <a href="#common-mistakes">Common Mistakes</a>
+        <a href="#optimal-use">Optimal Use of Sleep</a>
+        <a href="#example">Professional Example</a>
+        <a href="#conclusion">Conclusion</a>
+    </nav>
+    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            In FiveM, threads allow for continuous execution of tasks in the background. To ensure performance is not compromised, it’s essential to use pauses (or "sleep") with <code>Citizen.Wait</code>. This guide explores the correct use of sleep in threads, common pitfalls, and optimization techniques.
+        </p>
+
+        <h2 id="what-is-citizen-wait">2. What is Citizen.Wait?</h2>
+        <p>
+            The function <code>Citizen.Wait(ms)</code> pauses the execution of a thread for a defined time in milliseconds (<strong>ms</strong>). While the thread is paused, CPU resources are freed for other tasks.
+        </p>
+        <pre><code class="language-lua">
+Citizen.Wait(1000) -- Waits for 1 second (1000 ms)
+        </code></pre>
+        <p><strong>Key Points:</strong></p>
+        <ul>
+            <li><strong>Milliseconds:</strong> The parameter is the duration of the pause in milliseconds.</li>
+            <li><strong>Non-blocking:</strong> The thread stops temporarily, but other scripts or threads can continue running.</li>
+        </ul>
+
+        <h2 id="common-mistakes">3. Common Mistakes</h2>
+        <h3>3.1 No Wait in Infinite Loops</h3>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        -- Dangerous: No pause in the loop
+        print("This will overload the CPU!")
+    end
+end)
+        </code></pre>
+        <p><strong>Why is this bad?</strong> Without a pause, the loop runs constantly and consumes 100% of the CPU, causing lag and poor performance.</p>
+
+        <h3>3.2 Using Wait(0) Unnecessarily</h3>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        print("Executed every frame")
+        Citizen.Wait(0) -- Suitable only for critical tasks
+    end
+end)
+        </code></pre>
+        <p><strong>Best Practice:</strong> Use <code>Citizen.Wait(0)</code> only when the logic must execute every frame, such as rendering elements on the screen.</p>
+
+        <h2 id="optimal-use">4. Optimal Use of Sleep</h2>
+        <p>Dynamic sleep times allow for efficient execution based on the context.</p>
+        <h3>4.1 Dynamic Timing</h3>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 1000 -- Default sleep time
+        if PlayerIsNearTarget() then
+            sleep = 100 -- Reduce sleep when close to a target
+        end
+        Citizen.Wait(sleep) -- Adjust wait time dynamically
+    end
+end)
+        </code></pre>
+        <p>
+            By dynamically adjusting the sleep time, scripts run efficiently without sacrificing responsiveness.
+        </p>
+
+        <h2 id="example">5. Professional Example</h2>
+        <pre><code class="language-lua">
+Citizen.CreateThread(function()
+    while true do
+        local sleep = 500 -- Default wait time
+        local player = PlayerPedId()
+        local coords = GetEntityCoords(player)
+        local targetCoords = vector3(100.0, 200.0, 20.0)
+
+        if #(coords - targetCoords) < 10.0 then
+            print("Near the target!")
+            sleep = 100 -- Check more frequently
+        end
+
+        Citizen.Wait(sleep)
+    end
+end)
+        </code></pre>
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li>Calculates distance between the player and a target point.</li>
+            <li>Reduces the sleep time for frequent checks when near the target.</li>
+            <li>Efficiently manages CPU usage by increasing sleep time when the player is far from the target.</li>
+        </ul>
+
+        <h2 id="conclusion">6. Conclusion</h2>
+        <p>
+            Using <code>Citizen.Wait</code> effectively is essential for maintaining performance in FiveM scripts. By combining dynamic sleep times with optimized loops, you can ensure responsive and resource-friendly scripts.
+        </p>
+    </div>
+
+    <footer>
+        <p>Quasar University - Optimizing Threads in FiveM</p>
+    </footer>
+</body>
+</html>
