@@ -94,116 +94,147 @@
             }
     </style>
     </head>
-<body>
-    <header>
-        <img src="../headlogo.png" alt="Quasar University Logo">
-        <h1>Quasar University</h1>
-        <p>Optimizing Threads in FiveM</p>
-    </header>
-
-    <nav class="menu">
-        <a href="#introduction">Introduction</a>
-        <a href="#what-is-citizen-wait">What is Citizen.Wait?</a>
-        <a href="#common-mistakes">Common Mistakes</a>
-        <a href="#optimal-use">Optimal Use of Sleep</a>
-        <a href="#example">Professional Example</a>
-        <a href="#conclusion">Conclusion</a>
-    </nav>
-    <a href="#top" id="back-to-top" title="Back to Top">↑</a>
-
-    <div class="container">
-        <h2 id="introduction">1. Introduction</h2>
-        <p>
-            In FiveM, threads allow for continuous execution of tasks in the background. To ensure performance is not compromised, it’s essential to use pauses (or "sleep") with <code>Citizen.Wait</code>. This guide explores the correct use of sleep in threads, common pitfalls, and optimization techniques.
-        </p>
-
-        <h2 id="what-is-citizen-wait">2. What is Citizen.Wait?</h2>
-        <p>
-            The function <code>Citizen.Wait(ms)</code> pauses the execution of a thread for a defined time in milliseconds (<strong>ms</strong>). While the thread is paused, CPU resources are freed for other tasks.
-        </p>
-        <pre><code class="language-lua">
-Citizen.Wait(1000) -- Waits for 1 second (1000 ms)
-        </code></pre>
-        <p><strong>Key Points:</strong></p>
-        <ul>
-            <li><strong>Milliseconds:</strong> The parameter is the duration of the pause in milliseconds.</li>
-            <li><strong>Non-blocking:</strong> The thread stops temporarily, but other scripts or threads can continue running.</li>
-        </ul>
-
-        <h2 id="common-mistakes">3. Common Mistakes</h2>
-        <h3>3.1 No Wait in Infinite Loops</h3>
-        <pre><code class="language-lua">
-Citizen.CreateThread(function()
-    while true do
-        -- Dangerous: No pause in the loop
-        print("This will overload the CPU!")
-    end
-end)
-        </code></pre>
-        <p><strong>Why is this bad?</strong> Without a pause, the loop runs constantly and consumes 100% of the CPU, causing lag and poor performance.</p>
-
-        <h3>3.2 Using Wait(0) Unnecessarily</h3>
-        <pre><code class="language-lua">
-Citizen.CreateThread(function()
-    while true do
-        print("Executed every frame")
-        Citizen.Wait(0) -- Suitable only for critical tasks
-    end
-end)
-        </code></pre>
-        <p><strong>Best Practice:</strong> Use <code>Citizen.Wait(0)</code> only when the logic must execute every frame, such as rendering elements on the screen.</p>
-
-        <h2 id="optimal-use">4. Optimal Use of Sleep</h2>
-        <p>Dynamic sleep times allow for efficient execution based on the context.</p>
-        <h3>4.1 Dynamic Timing</h3>
-        <pre><code class="language-lua">
-Citizen.CreateThread(function()
-    while true do
-        local sleep = 1000 -- Default sleep time
-        if PlayerIsNearTarget() then
-            sleep = 100 -- Reduce sleep when close to a target
+    <body>
+        <header>
+            <img src="../headlogo.png" alt="Quasar University Logo">
+            <h1>Quasar University</h1>
+            <p>Comprehensive Guide to ox_target Functions for FiveM</p>
+        </header>
+    
+        <nav class="menu">
+            <a href="#introduction">Introduction</a>
+            <a href="#disable-targeting">disableTargeting</a>
+            <a href="#global-options">Global Options</a>
+            <a href="#model-options">Model Options</a>
+            <a href="#entity-options">Entity Options</a>
+            <a href="#zones">Interaction Zones</a>
+            <a href="#conclusion">Conclusion</a>
+        </nav>
+        <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+    
+        <div class="container">
+            <h2 id="introduction">1. Introduction</h2>
+            <p>
+                This guide explains how to use the most important functions of <code>ox_target</code>, a targeting tool for FiveM that allows you to create dynamic and custom interactions.
+            </p>
+    
+            <h2 id="disable-targeting">2. disableTargeting</h2>
+            <p>This function temporarily disables the targeting menu.</p>
+            <pre><code class="language-lua">
+    -- Disable the targeting menu
+    exports.ox_target:disableTargeting(true)
+    
+    -- Perform some operations...
+    
+    -- Re-enable the targeting menu
+    exports.ox_target:disableTargeting(false)
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li><strong>Parameter:</strong> <code>state</code> is a boolean that defines whether the targeting should be enabled or disabled.</li>
+                <li>Useful during moments where players should not interact with objects or zones, such as during cutscenes.</li>
+            </ul>
+    
+            <h2 id="global-options">3. Global Options</h2>
+            <p>Global options are always available to the player.</p>
+            <pre><code class="language-lua">
+    -- Add a global option
+    exports.ox_target:addGlobalOption({
+        name = 'global:help',
+        label = 'Request Help',
+        icon = 'fas fa-hands-helping',
+        onSelect = function(data)
+            print('You have requested help.')
         end
-        Citizen.Wait(sleep) -- Adjust wait time dynamically
-    end
-end)
-        </code></pre>
-        <p>
-            By dynamically adjusting the sleep time, scripts run efficiently without sacrificing responsiveness.
-        </p>
-
-        <h2 id="example">5. Professional Example</h2>
-        <pre><code class="language-lua">
-Citizen.CreateThread(function()
-    while true do
-        local sleep = 500 -- Default wait time
-        local player = PlayerPedId()
-        local coords = GetEntityCoords(player)
-        local targetCoords = vector3(100.0, 200.0, 20.0)
-
-        if #(coords - targetCoords) < 10.0 then
-            print("Near the target!")
-            sleep = 100 -- Check more frequently
-        end
-
-        Citizen.Wait(sleep)
-    end
-end)
-        </code></pre>
-        <p><strong>Explanation:</strong></p>
-        <ul>
-            <li>Calculates distance between the player and a target point.</li>
-            <li>Reduces the sleep time for frequent checks when near the target.</li>
-            <li>Efficiently manages CPU usage by increasing sleep time when the player is far from the target.</li>
-        </ul>
-
-        <h2 id="conclusion">6. Conclusion</h2>
-        <p>
-            Using <code>Citizen.Wait</code> effectively is essential for maintaining performance in FiveM scripts. By combining dynamic sleep times with optimized loops, you can ensure responsive and resource-friendly scripts.
-        </p>
-    </div>
-
-    <footer>
-        <p>Quasar University - Optimizing Threads in FiveM</p>
-    </footer>
-</body>
+    })
+    
+    -- Remove a global option
+    exports.ox_target:removeGlobalOption('global:help')
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li>The "Request Help" option will always be available regardless of the player's location.</li>
+                <li><strong>onSelect:</strong> Defines the action triggered when selecting this option.</li>
+            </ul>
+    
+            <h2 id="model-options">4. Model Options</h2>
+            <p>Associates specific interactions with game models.</p>
+            <pre><code class="language-lua">
+    -- Add options to a model
+    exports.ox_target:addModel('prop_atm_01', {
+        {
+            name = 'atm:use',
+            label = 'Use ATM',
+            icon = 'fas fa-credit-card',
+            onSelect = function(data)
+                print('Interacting with the ATM.')
+            end
+        }
+    })
+    
+    -- Remove options from a model
+    exports.ox_target:removeModel('prop_atm_01', 'atm:use')
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li>The <code>prop_atm_01</code> model will have the "Use ATM" option.</li>
+                <li>Perfect for adding functionality to static objects like ATMs, doors, etc.</li>
+            </ul>
+    
+            <h2 id="entity-options">5. Entity Options</h2>
+            <p>Defines interactions for specific entities using their network identifiers.</p>
+            <pre><code class="language-lua">
+    local netId = NetworkGetNetworkIdFromEntity(entity)
+    exports.ox_target:addEntity(netId, {
+        {
+            name = 'entity:inspect',
+            label = 'Inspect Entity',
+            icon = 'fas fa-search',
+            onSelect = function(data)
+                print('Inspecting the entity.')
+            end
+        }
+    })
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li>Allows linking interactions to NPCs or other players.</li>
+            </ul>
+    
+            <h2 id="zones">6. Interaction Zones</h2>
+            <p>Creates interactive zones of different shapes: spherical, cubic, or polygonal.</p>
+            <pre><code class="language-lua">
+    -- Add a box zone
+    exports.ox_target:addBoxZone({
+        coords = vec3(200.0, -1000.0, 30.0),
+        size = vec3(3.0, 3.0, 2.0),
+        options = {
+            {
+                name = 'zone:enter',
+                label = 'Enter Zone',
+                icon = 'fas fa-sign-in-alt',
+                onSelect = function(data)
+                    print('You entered the box zone.')
+                end
+            }
+        }
+    })
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li>Allows creating interaction areas for events, missions, or important locations.</li>
+            </ul>
+            <h2 id="conclusion">7. Conclusion</h2>
+            <p>
+                ox_target is a versatile and powerful tool for creating interactive gameplay in FiveM. By leveraging advanced configurations like dynamic zones, role-based permissions, and server callbacks, developers can build immersive and efficient systems tailored to their server's needs.
+            </p>
+            <p>For further documentation, visit the <a href="https://overextended.dev/ox_target" target="_blank">official ox_target documentation</a>.</p>
+        
+        </div>
+    
+        <footer>
+            <p>Quasar University - Comprehensive Guide to ox_target for FiveM</p>
+        </footer>
+    </body>
+    
 </html>
