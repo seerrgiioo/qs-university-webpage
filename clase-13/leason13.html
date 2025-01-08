@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+        <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+        <title>Quasar University | Optimizing Threads with Sleep</title>
+        <style>
+            body {
+                font-family: 'Cascadia Code', monospace;
+                background-color: #121212;
+                color: #e0e0e0;
+                margin: 0;
+                padding: 0;
+                line-height: 1.6;
+            }
+            header {
+                background: linear-gradient(135deg, #23282d, #1976b9);
+                color: white;
+                padding: 15px;
+                text-align: center;
+            }
+            header img {
+                height: 100px;
+                vertical-align: middle;
+                margin-right: 15px;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 20px auto;
+                background: #1e1e1e;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            h1, h2, h3 {
+                color: #00c2e0;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            footer {
+                text-align: center;
+                margin-top: 20px;
+                color: #757575;
+            }
+            .menu {
+                background: #1e1e1e;
+                padding: 15px;
+                text-align: center;
+                border-radius: 8px;
+                margin: 20px 0;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+            }
+            .menu a {
+                color: #00c2e0;
+                text-decoration: none;
+                font-size: 1.2em;
+                margin: 0 15px;
+                transition: color 0.3s ease;
+            }
+            .menu a:hover {
+                color: #1e88e5;
+            }
+            #back-to-top {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                background-color: #00c2e0;
+                color: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-decoration: none;
+                font-size: 24px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+                opacity: 0.8;
+                transition: opacity 0.3s, transform 0.3s;
+            }
+            #back-to-top:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            html {
+                scroll-behavior: smooth;
+            }
+    </style>
+    </head>
+    <body>
+        <header>
+            <img src="../headlogo.png" alt="Quasar University Logo">
+            <h1>Quasar University</h1>
+            <p>Comprehensive Guide to ox_target Functions for FiveM</p>
+        </header>
+    
+        <nav class="menu">
+            <a href="../index">HOME</a>
+            <a href="#introduction">Introduction</a>
+            <a href="#disable-targeting">disableTargeting</a>
+            <a href="#global-options">Global Options</a>
+            <a href="#model-options">Model Options</a>
+            <a href="#entity-options">Entity Options</a>
+            <a href="#zones">Interaction Zones</a>
+            <a href="#conclusion">Conclusion</a>
+        </nav>
+        <a href="#top" id="back-to-top" title="Back to Top">↑</a>
+    
+        <div class="container">
+            <h2 id="introduction">1. Introduction</h2>
+            <p>
+                Tables in Lua are a flexible and essential data structure. They can act as arrays, dictionaries, or even both simultaneously. Lua tables are untyped, dynamic, and indexed, making them versatile for various programming tasks.
+            </p>
+    
+            <h2 id="creating-tables">2. Creating Tables</h2>
+            <p>Tables are created using curly braces <code>{}</code>. Here’s how:</p>
+            <pre><code class="language-lua">
+    -- Create an empty table
+    local myTable = {}
+    
+    -- Create a table with values
+    local fruits = {"apple", "banana", "cherry"}
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li><strong>Empty tables:</strong> <code>{}</code> creates a blank table. You can dynamically add key-value pairs or indexed values.</li>
+                <li><strong>Indexed tables:</strong> Tables like <code>{"apple", "banana", "cherry"}</code> automatically assign numerical indices starting from 1.</li>
+            </ul>
+    
+            <h2 id="accessing-tables">3. Accessing Tables</h2>
+            <p>Accessing table values depends on whether you're using indices (arrays) or keys (dictionaries).</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana", "cherry"}
+    
+    -- Access by index
+    print(fruits[1]) -- Output: apple
+    
+    -- Using keys
+    local person = {name = "John", age = 30}
+    print(person.name) -- Output: John
+    print(person["age"]) -- Output: 30
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li><strong>Index-based access:</strong> Use numerical indices (e.g., <code>fruits[1]</code>) to retrieve values from an indexed table.</li>
+                <li><strong>Key-based access:</strong> Use dot notation (<code>person.name</code>) or bracket notation (<code>person["name"]</code>) for dictionaries.</li>
+            </ul>
+    
+            <h2 id="modifying-tables">4. Modifying Tables</h2>
+            <p>You can add, update, or delete values in a table dynamically.</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana"}
+    
+    -- Adding a new element
+    fruits[3] = "cherry"
+    
+    -- Updating an existing element
+    fruits[1] = "grape"
+    
+    -- Deleting an element
+    fruits[2] = nil -- Removes "banana"
+    
+    -- Printing updated table
+    for i, fruit in ipairs(fruits) do
+        print(i, fruit)
+    end
+            </code></pre>
+            <p><strong>Explanation:</strong></p>
+            <ul>
+                <li><strong>Adding values:</strong> Specify an unused index or key to add new elements.</li>
+                <li><strong>Updating values:</strong> Use an existing index or key to modify a value.</li>
+                <li><strong>Removing values:</strong> Set the value to <code>nil</code> to remove it from the table.</li>
+            </ul>
+    
+            <h2 id="table-library">5. Using the `table` Library</h2>
+            <p>The <code>table</code> library provides built-in functions to manipulate tables. Below are the most commonly used functions:</p>
+    
+            <h3>5.1 table.insert</h3>
+            <p>Adds an element to a table at a specified position.</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana"}
+    
+    -- Insert "cherry" at position 2
+    table.insert(fruits, 2, "cherry")
+            </code></pre>
+            <p><strong>How it works:</strong> Inserts <code>"cherry"</code> at index 2, shifting subsequent elements to the right.</p>
+    
+            <h3>5.2 table.remove</h3>
+            <p>Removes an element from a table at a specified position.</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana", "cherry"}
+    
+    -- Remove the second element
+    table.remove(fruits, 2)
+            </code></pre>
+            <p><strong>How it works:</strong> Removes the element at index 2 (<code>"banana"</code>), and subsequent elements are shifted left.</p>
+    
+            <h3>5.3 table.sort</h3>
+            <p>Sorts table elements in ascending order.</p>
+            <pre><code class="language-lua">
+    local numbers = {3, 1, 4, 1, 5, 9}
+    
+    -- Sort the numbers
+    table.sort(numbers)
+            </code></pre>
+            <p><strong>How it works:</strong> Reorders elements in ascending order. For custom sorting, provide a comparator function.</p>
+    
+            <h3>5.4 table.concat</h3>
+            <p>Concatenates table elements into a string.</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana", "cherry"}
+    
+    -- Join elements with a comma
+    local result = table.concat(fruits, ", ")
+    print(result) -- Output: apple, banana, cherry
+            </code></pre>
+            <p><strong>How it works:</strong> Joins all elements with the specified separator (<code>", "</code>).</p>
+    
+            <h2 id="loops-tables">6. Looping Through Tables</h2>
+            <p>There are two main methods to loop through tables: <code>ipairs</code> and <code>pairs</code>.</p>
+    
+            <h3>6.1 ipairs</h3>
+            <p>Used for sequential tables (arrays). Iterates over numeric indices in ascending order.</p>
+            <pre><code class="language-lua">
+    local fruits = {"apple", "banana", "cherry"}
+    
+    for i, fruit in ipairs(fruits) do
+        print(i, fruit)
+    end
+            </code></pre>
+            <p><strong>How it works:</strong> <code>ipairs</code> stops when it encounters a <code>nil</code> value, ensuring sequential iteration.</p>
+    
+            <h3>6.2 pairs</h3>
+            <p>Used for key-value tables (dictionaries). Iterates over all key-value pairs.</p>
+            <pre><code class="language-lua">
+    local person = {name = "John", age = 30}
+    
+    for key, value in pairs(person) do
+        print(key, value)
+    end
+            </code></pre>
+            <p><strong>How it works:</strong> <code>pairs</code> iterates over every key-value pair, regardless of order.</p>
+    
+            <h2 id="conclusion">7. Conclusion</h2>
+            <p>Tables in Lua offer unmatched flexibility. Whether you're building arrays, dictionaries, or hybrid structures, mastering tables is essential for any Lua developer. The <code>table</code> library and looping constructs further enhance table manipulation.</p>
+        </div>
+    
+        <footer>
+            <p>Quasar University - Comprehensive Guide to Lua Tables</p>
+        </footer>
+    </body>
+    
+</html>
