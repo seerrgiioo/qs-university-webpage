@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Creating Configurable Blips in FiveM</title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        header img {
+            height: 100px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #757575;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+</style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Creating Configurable Blips in FiveM with Deletion Commands</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">HOME</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#config-lua">Configuring Blips</a>
+        <a href="#creating-blips">Creating Blips Dynamically</a>
+        <a href="#deleting-blips">Deleting Blips</a>
+        <a href="#practical-examples">Practical Examples</a>
+        <a href="#conclusion">Conclusion</a>
+    </nav>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            Blips are critical for highlighting key locations on the in-game map. In this guide, you'll learn how to create and manage blips dynamically using a configuration file and Lua scripts. We'll also add functionality to delete specific blips through commands.
+        </p>
+
+        <h2 id="config-lua">2. Configuring Blips in <code>config.lua</code></h2>
+        <p>
+            The `config.lua` file allows server owners to predefine blips with specific properties. This centralizes configuration and simplifies blip creation.
+        </p>
+        <pre><code class="language-lua">
+Config = {}
+
+-- Define blips
+Config.Blips = {
+    {
+        name = "Police Station",
+        coords = vector3(425.1, -979.5, 30.7),
+        sprite = 60,
+        color = 29,
+        scale = 1.0
+    },
+    {
+        name = "Hospital",
+        coords = vector3(295.8, -584.9, 43.1),
+        sprite = 61,
+        color = 2,
+        scale = 1.2
+    },
+    {
+        name = "Garage",
+        coords = vector3(215.8, -810.1, 30.7),
+        sprite = 50,
+        color = 3,
+        scale = 0.8
+    }
+}
+        </code></pre>
+
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><code>Config.Blips</code>: A table containing predefined blips with attributes.</li>
+            <li><code>coords</code>: Uses a <code>vector3</code> to define the blip’s position.</li>
+            <li><code>sprite</code>, <code>color</code>, and <code>scale</code>: Customizable visual properties.</li>
+        </ul>
+
+        <h2 id="creating-blips">3. Creating Blips Dynamically</h2>
+        <p>
+            Use the <code>Config.Blips</code> data to spawn blips dynamically when the resource starts:
+        </p>
+        <pre><code class="language-lua">
+local createdBlips = {}
+
+-- Create blips from config
+function LoadBlips()
+    for _, blipData in pairs(Config.Blips) do
+        local blip = AddBlipForCoord(blipData.coords.x, blipData.coords.y, blipData.coords.z)
+        SetBlipSprite(blip, blipData.sprite)
+        SetBlipColour(blip, blipData.color)
+        SetBlipScale(blip, blipData.scale)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentString(blipData.name)
+        EndTextCommandSetBlipName(blip)
+        table.insert(createdBlips, blip)
+    end
+end
+
+-- Initialize blips on resource start
+AddEventHandler('onResourceStart', function(resourceName)
+    if GetCurrentResourceName() == resourceName then
+        LoadBlips()
+        print("Blips loaded from config.")
+    end
+end)
+        </code></pre>
+
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><code>createdBlips</code>: A table storing the handles of created blips for later management.</li>
+            <li><code>LoadBlips</code>: Loops through <code>Config.Blips</code> to create and configure each blip.</li>
+        </ul>
+
+        <h2 id="deleting-blips">4. Deleting Blips</h2>
+        <p>To delete all blips dynamically, we provide a command:</p>
+        <pre><code class="language-lua">
+-- Command to delete all blips
+RegisterCommand('deleteallblips', function(source, args)
+    for _, blip in pairs(createdBlips) do
+        if DoesBlipExist(blip) then
+            RemoveBlip(blip)
+        end
+    end
+    createdBlips = {}
+    print("All blips deleted.")
+end, false)
+        </code></pre>
+
+        <p><strong>Explanation:</strong></p>
+        <ul>
+            <li><code>DoesBlipExist</code>: Checks if the blip exists before attempting deletion.</li>
+            <li><code>RemoveBlip</code>: Removes the blip from the game map.</li>
+            <li><code>createdBlips</code>: Cleared after deleting all blips to avoid referencing invalid handles.</li>
+        </ul>
+
+        <h2 id="practical-examples">5. Practical Examples</h2>
+        <h3>Example 1: Predefined Blips on Startup</h3>
+        <p>When the resource starts, the blips defined in <code>config.lua</code> are automatically created.</p>
+
+        <h3>Example 2: Deleting Blips</h3>
+        <p>Use the <code>/deleteallblips</code> command to remove all created blips dynamically during gameplay.</p>
+
+        <h3>Example 3: Adding a New Blip</h3>
+        <p>
+            To add a new blip, simply add a new entry to the <code>Config.Blips</code> table in <code>config.lua</code>:
+        </p>
+        <pre><code class="language-lua">
+{
+    name = "Bank",
+    coords = vector3(150.2, -1040.3, 29.3),
+    sprite = 108,
+    color = 5,
+    scale = 1.0
+}
+        </code></pre>
+        <p>
+            After restarting the resource, this new blip will appear on the map automatically.
+        </p>
+
+        <h2 id="conclusion">6. Conclusion</h2>
+        <p>
+            This guide demonstrated how to create, manage, and delete blips in FiveM using a centralized configuration file. By using this approach, server administrators can easily modify and control blips without editing Lua scripts directly. Encourage students to experiment with additional properties, such as dynamic updates or interaction zones!
+        </p>
+    </div>
+
+    <footer>
+        <p>Quasar University - Mastering FiveM Blips</p>
+    </footer>
+</body>
+</html>
