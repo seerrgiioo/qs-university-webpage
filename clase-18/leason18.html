@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Creating Configurable Blips in FiveM</title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        header img {
+            height: 100px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #757575;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+</style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Advanced Guide: Persistent Player Data System in FiveM</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">Home</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#config">Config Setup</a>
+        <a href="#database">Database Schema</a>
+        <a href="#server">Server-Side</a>
+        <a href="#client">Client-Side</a>
+        <a href="#ui">User Interface</a>
+        <a href="#commands">Player Commands</a>
+        <a href="#fxmanifest">FX Manifest</a>
+        <a href="#setup">Setting Up</a>
+        <a href="#conclusion">Conclusion</a>
+    </nav>
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide covers an advanced **persistent player data system** for FiveM using **Lua, MySQL Async, and NUI (HTML UI)**.
+            The system saves and retrieves **player money, job, XP, and level** in a database.
+        </p>
+
+        <h2 id="config">2. Configuration (`config.lua`)</h2>
+        <p>
+            The `config.lua` file defines database credentials and default player data settings.
+        </p>
+        <pre><code class="language-lua">
+Config = {}
+
+Config.Defaults = {
+    money = 1000,
+    job = "unemployed",
+    xp = 0,
+    level = 1
+}
+
+Config.Debug = true
+        </code></pre>
+
+        <h2 id="database">3. Database Schema (`player_data.sql`)</h2>
+        <p>
+            Execute this SQL query to set up the database table.
+        </p>
+        <pre><code class="language-sql">
+CREATE TABLE IF NOT EXISTS player_data (
+    identifier VARCHAR(64) PRIMARY KEY,
+    money INT DEFAULT 1000,
+    job VARCHAR(50) DEFAULT 'unemployed',
+    xp INT DEFAULT 0,
+    level INT DEFAULT 1
+);
+        </code></pre>
+
+        <h2 id="server">4. Server-Side Code (`server.lua`)</h2>
+        <p>
+            This script handles MySQL queries and synchronizes player data.
+        </p>
+        <pre><code class="language-lua">
+
+RegisterServerEvent('playerData:load')
+AddEventHandler('playerData:load', function()
+    local src = source
+    local identifier = GetPlayerIdentifier(src, 0)
+
+    MySQL.Async.fetchAll("SELECT * FROM player_data WHERE identifier = @identifier", {
+        ['@identifier'] = identifier
+    }, function(result)
+        if result[1] then
+            TriggerClientEvent('playerData:set', src, result[1])
+        else
+            MySQL.Async.execute("INSERT INTO player_data (identifier, money, job, xp, level) VALUES (@identifier, @money, @job, @xp, @level)", {
+                ['@identifier'] = identifier,
+                ['@money'] = Config.Defaults.money,
+                ['@job'] = Config.Defaults.job,
+                ['@xp'] = Config.Defaults.xp,
+                ['@level'] = Config.Defaults.level
+            })
+            TriggerClientEvent('playerData:set', src, Config.Defaults)
+        end
+    end)
+end)
+
+RegisterServerEvent('playerData:update')
+AddEventHandler('playerData:update', function(data)
+    local src = source
+    local identifier = GetPlayerIdentifier(src, 0)
+
+    MySQL.Async.execute("UPDATE player_data SET money = @money, job = @job, xp = @xp, level = @level WHERE identifier = @identifier", {
+        ['@identifier'] = identifier,
+        ['@money'] = data.money,
+        ['@job'] = data.job,
+        ['@xp'] = data.xp,
+        ['@level'] = data.level
+    })
+end)
+        </code></pre>
+
+        <h2 id="client">5. Client-Side Code (`client.lua`)</h2>
+        <p>
+            This script listens for player data updates and sends them to the UI.
+        </p>
+        <pre><code class="language-lua">
+RegisterNetEvent('playerData:set')
+AddEventHandler('playerData:set', function(data)
+    SendNUIMessage({
+        action = 'updateStats',
+        money = data.money,
+        job = data.job,
+        xp = data.xp,
+        level = data.level
+    })
+end)
+
+RegisterCommand('checkstats', function()
+    TriggerServerEvent('playerData:load')
+end, false)
+        </code></pre>
+
+        <h2 id="ui">6. User Interface (`ui/index.html`)</h2>
+        <p>
+            A simple UI to display player statistics.
+        </p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Player Stats UI&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="playerStatsUI"&gt;
+        &lt;h2&gt;Player Stats&lt;/h2&gt;
+        &lt;p&gt;Money: &lt;span id="money"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Job: &lt;span id="job"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;XP: &lt;span id="xp"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Level: &lt;span id="level"&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;script&gt;
+        window.addEventListener('message', function(event) {
+            if (event.data.action === 'updateStats') {
+                document.getElementById('money').textContent = event.data.money;
+                document.getElementById('job').textContent = event.data.job;
+                document.getElementById('xp').textContent = event.data.xp;
+                document.getElementById('level').textContent = event.data.level;
+            }
+        });
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+</code></pre>
+            
+        <h2 id="commands">7. Player Commands</h2>
+        <p>
+            Players can check their stats and change jobs dynamically.
+        </p>
+        <pre><code class="language-lua">
+RegisterCommand('checkstats', function()
+    TriggerServerEvent('playerData:load')
+end, false)
+
+RegisterCommand('setjob', function(source, args)
+    local newJob = args[1]
+    TriggerServerEvent('playerData:update', { job = newJob })
+end, false)
+        </code></pre>
+
+        <h2 id="fxmanifest">8. FX MANIFEST</h2>
+        <p>
+            Add the following line to your `fxmanifest.lua`:
+        </p>
+        <pre><code class="language-lua">fx_version "adamant"
+game "gta5"
+lua54 "yes"
+
+version "1.0.0"
+
+client_scripts { "client/**/*.lua" }
+server_scripts { "server/**/*.lua", "@oxmysql/lib/MySQL.lua" }</code></pre>
+        <h2 id="setup">9. Setting Up</h2>
+        <p>
+            Follow these steps to set up the script:
+        </p>
+        <ul>
+            <li>Place the `persistent_player_data` folder inside `resources/`.</li>
+            <li>Add `start persistent_player_data` to `server.cfg`.</li>
+            <li>Restart the server and use `/checkstats` to test.</li>
+        </ul>
+
+        <h2 id="conclusion">10. Conclusion</h2>
+        <p>
+            This lesson teaches **a complete FiveM system** that allows persistent storage of player data.
+        </p>
+        <p>
+            ✅ **Saves XP, money, and job**  
+            ✅ **Real-time updates with UI integration**  
+            ✅ **Expandable to include achievements, health, inventory, etc.**  
+        </p>
+        <p>
+            What would you like to add next? 🚀</p> 
+            Now you have to try it yourself! 🎉
+        </p>
+    </div>
+</body>
+
+</html>
