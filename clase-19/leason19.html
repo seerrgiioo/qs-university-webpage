@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Creating Configurable Blips in FiveM</title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        header img {
+            height: 100px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #757575;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+</style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Advanced Guide: Player Customization System in FiveM</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">Home</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#config">Config Setup</a>
+        <a href="#database">Database Schema</a>
+        <a href="#server">Server-Side</a>
+        <a href="#client">Client-Side</a>
+        <a href="#ui">User Interface</a>
+        <a href="#commands">Player Commands</a>
+        <a href="#setup">Setting Up</a>
+        <a href="#conclusion">Conclusion</a>
+    </nav>
+    
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide covers an advanced player customization system for FiveM using Lua, MySQL, and NUI (HTML UI).
+            The system allows players to save and retrieve character appearance settings like model, hair, beard, eye color, and skin tone.
+        </p>
+        <h2 id="config">2. Configuration (`config.lua`)</h2>
+        <p>
+            The `config.lua` file defines default values for new players and database connection settings. 
+        </p>
+        <pre><code class="language-lua">
+Config = {}
+
+Config.Defaults = {
+    model = "mp_m_freemode_01",
+    hair = 1,
+    beard = 0,
+    eye_color = 0,
+    skin_tone = 1
+}
+
+Config.Debug = true
+        </code></pre>
+        <p>
+            Set `Debug` to `true` to enable debug messages in the console. 
+            Set `Defaults` to define default values for new players.
+            Set `model`, `hair`, `beard`, `eye_color`, and `skin_tone` to define default values for new players.
+
+        </p>
+        <h2 id="database">3. Database Schema (`customization_data.sql`)</h2>
+        <p>
+            Run this SQL query to create the database table for storing player appearance settings.
+        </p>
+        <pre><code class="language-sql">
+CREATE TABLE IF NOT EXISTS customization_data (
+    identifier VARCHAR(64) PRIMARY KEY,
+    model VARCHAR(50) DEFAULT 'mp_m_freemode_01',
+    hair INT DEFAULT 1,
+    beard INT DEFAULT 0,
+    eye_color INT DEFAULT 0,
+    skin_tone INT DEFAULT 1
+);
+        </code></pre>
+        <h2 id="server">4. Server-Side Code (`server.lua`)</h2>
+        <p>
+            This script handles MySQL queries and updates player customization data.
+        </p>
+        <pre><code class="language-lua">
+RegisterServerEvent('customization:load')
+AddEventHandler('customization:load', function()
+    local src = source
+    local identifier = GetPlayerIdentifier(src, 0)
+
+    MySQL.Async.fetchAll("SELECT * FROM customization_data WHERE identifier = @identifier", {
+        ['@identifier'] = identifier
+    }, function(result)
+        if result[1] then
+            TriggerClientEvent('customization:set', src, result[1])
+        else
+            MySQL.Async.execute("INSERT INTO customization_data (identifier, model, hair, beard, eye_color, skin_tone) VALUES (@identifier, @model, @hair, @beard, @eye_color, @skin_tone)", {
+                ['@identifier'] = identifier,
+                ['@model'] = Config.Defaults.model,
+                ['@hair'] = Config.Defaults.hair,
+                ['@beard'] = Config.Defaults.beard,
+                ['@eye_color'] = Config.Defaults.eye_color,
+                ['@skin_tone'] = Config.Defaults.skin_tone
+            })
+            TriggerClientEvent('customization:set', src, Config.Defaults)
+        end
+    end)
+end)
+        </code></pre>
+        <h2 id="client">5. Client-Side Code (`client.lua`)</h2>
+        <p>
+            This script listens for player customization updates and displays them on the UI.
+        </p>
+        <pre><code class="language-lua">
+RegisterNetEvent('customization:set')
+AddEventHandler('customization:set', function(data)
+    SendNUIMessage({
+        action = 'updateCustomization',
+        model = data.model,
+        hair = data.hair,
+        beard = data.beard,
+        eye_color = data.eye_color,
+        skin_tone = data.skin_tone
+    })
+end)
+
+RegisterCommand('checkcustomization', function()
+    TriggerServerEvent('customization:load')
+end, false)
+        </code></pre>
+        <h2 id="ui">6. User Interface (`ui/index.html`)</h2>
+        <p>
+            A simple UI to display and manage player customization.
+        </p>
+        <pre><code class="language-html">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Player Customization&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="customizationUI"&gt;
+        &lt;h2&gt;Player Customization&lt;/h2&gt;
+        &lt;p&gt;Model: &lt;span id="model"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Hair: &lt;span id="hair"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Beard: &lt;span id="beard"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Eye Color: &lt;span id="eye_color"&gt;&lt;/span&gt;&lt;/p&gt;
+        &lt;p&gt;Skin Tone: &lt;span id="skin_tone"&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;/div&gt;
+
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+        </code></pre>
+        <h2 id="ui-js">6.1 User Interface JavaScript (`ui/script.js`)</h2>
+        <p>
+            The `script.js` file listens for messages from the FiveM client and updates the UI accordingly.
+        </p>
+        <pre><code class="language-javascript">
+window.addEventListener('message', function(event) {
+    if (event.data.action === 'updateCustomization') {
+        document.getElementById('model').textContent = event.data.model;
+        document.getElementById('hair').textContent = event.data.hair;
+        document.getElementById('beard').textContent = event.data.beard;
+        document.getElementById('eye_color').textContent = event.data.eye_color;
+        document.getElementById('skin_tone').textContent = event.data.skin_tone;
+    }
+});
+        </code></pre>
+
+        <h2 id="setup">7. Setting Up</h2>
+        <p>
+            Follow these steps to set up the script:
+        </p>
+        <ul>
+            <li>Create a folder inside `resources/` named `player_customization`.</li>
+            <li>Copy and paste the provided files into the folder.</li>
+            <li>Add this line to your `server.cfg`:</li>
+            <pre><code>start player_customization</code></pre>
+            <li>Restart your FiveM server.</li>
+            <li>Use `/checkcustomization` to load player customization.</li>
+        </ul>
+        <h2 id="conclusion">8. Conclusion</h2>
+        <p>
+            This lesson teaches a complete player customization system that allows persistent storage of character appearance data.
+        </p>
+        <p>
+            ✅ Saves character model, hair, beard, skin tone, and eye color  
+            ✅ Real-time updates with UI integration  
+            ✅ Expandable with additional customization features  
+        </p>
+        <p>
+            What would you like to add next? 🚀
+        </p>
+    </div>
+</body>
+</html>
+
