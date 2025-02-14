@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet">
+    <title>Quasar University | Creating Configurable Blips in FiveM</title>
+    <style>
+        body {
+            font-family: 'Cascadia Code', monospace;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        header {
+            background: linear-gradient(135deg, #23282d, #1976b9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        header img {
+            height: 100px;
+            vertical-align: middle;
+            margin-right: 15px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #00c2e0;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #757575;
+        }
+        .menu {
+            background: #1e1e1e;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .menu a {
+            color: #00c2e0;
+            text-decoration: none;
+            font-size: 1.2em;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        .menu a:hover {
+            color: #1e88e5;
+        }
+        #back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #00c2e0;
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0.8;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #back-to-top:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+</style>
+</head>
+<body>
+    <header>
+        <img src="../headlogo.png" alt="Quasar University Logo">
+        <h1>Quasar University</h1>
+        <p>Valentine's Day Event System in FiveM</p>
+    </header>
+
+    <nav class="menu">
+        <a href="../index">Home</a>
+        <a href="#introduction">Introduction</a>
+        <a href="#config">Config Setup</a>
+        <a href="#database">Database Schema</a>
+        <a href="#server">Server-Side</a>
+        <a href="#client">Client-Side</a>
+        <a href="#ui">User Interface</a>
+        <a href="#commands">Event Commands</a>
+        <a href="#setup">Setting Up</a>
+        <a href="#conclusion">Conclusion</a>
+    </nav>
+    
+
+    <div class="container">
+        <h2 id="introduction">1. Introduction</h2>
+        <p>
+            This guide covers an advanced Valentine's Day Event System for FiveM using Lua, MySQL, and NUI (HTML UI).
+            The system allows players to send and receive Valentine's gifts and messages while keeping track of interactions.
+        </p>
+        <h2 id="config">2. Configuration (`config.lua`)</h2>
+        <p>
+            The `config.lua` file defines default event settings and database connection.
+        </p>
+        <pre><code class="language-lua">
+Config = {}
+
+Config.Defaults = {
+    eventActive = true,
+    defaultMessage = "Happy Valentine's Day!",
+    defaultGift = "Chocolate Box"
+}
+
+Config.Debug = true
+        </code></pre>
+        <h2 id="database">3. Database Schema (`valentines_data.sql`)</h2>
+        <p>
+            Run this SQL query to create the database table for storing Valentine's gifts.
+        </p>
+        <pre><code class="language-sql">
+CREATE TABLE IF NOT EXISTS valentines_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender VARCHAR(64),
+    receiver VARCHAR(64),
+    message TEXT,
+    gift VARCHAR(50),
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+        </code></pre>
+        <h2 id="server">4. Server-Side Code (`server.lua`)</h2>
+        <p>
+            This script handles MySQL queries and updates Valentine's Day interactions.
+        </p>
+        <pre><code class="language-lua">
+RegisterServerEvent('valentine:sendGift')
+AddEventHandler('valentine:sendGift', function(targetPlayer, message, gift)
+    local src = source
+    local identifier = GetPlayerIdentifier(src, 0)
+    local targetIdentifier = GetPlayerIdentifier(targetPlayer, 0)
+
+    MySQL.Async.execute("INSERT INTO valentines_data (sender, receiver, message, gift) VALUES (@sender, @receiver, @message, @gift)", {
+        ['@sender'] = identifier,
+        ['@receiver'] = targetIdentifier,
+        ['@message'] = message,
+        ['@gift'] = gift
+    })
+
+    TriggerClientEvent('valentine:notify', targetPlayer, "You received a Valentine's gift!")
+end)
+
+RegisterServerEvent('valentine:getGifts')
+AddEventHandler('valentine:getGifts', function()
+    local src = source
+    local identifier = GetPlayerIdentifier(src, 0)
+
+    MySQL.Async.fetchAll("SELECT * FROM valentines_data WHERE receiver = @identifier", {
+        ['@identifier'] = identifier
+    }, function(results)
+        TriggerClientEvent('valentine:showGifts', src, results)
+    end)
+end)
+        </code></pre>
+        <h2 id="client">5. Client-Side Code (`client.lua`)</h2>
+        <p>
+            This script listens for Valentine's Day event updates and displays gifts in the UI.
+        </p>
+        <pre><code class="language-lua">
+RegisterNetEvent('valentine:notify')
+AddEventHandler('valentine:notify', function(message)
+    SendNUIMessage({
+        action = 'showNotification',
+        message = message
+    })
+end)
+
+RegisterNetEvent('valentine:showGifts')
+AddEventHandler('valentine:showGifts', function(gifts)
+    SendNUIMessage({
+        action = 'displayGifts',
+        gifts = gifts
+    })
+end)
+
+RegisterCommand('sendgift', function(source, args)
+    local targetPlayer = tonumber(args[1])
+    local gift = args[2] or "Chocolate Box"
+    local message = table.concat(args, " ", 3) or "Happy Valentine's Day!"
+
+    TriggerServerEvent('valentine:sendGift', targetPlayer, message, gift)
+end, false)
+
+RegisterCommand('checkgifts', function()
+    TriggerServerEvent('valentine:getGifts')
+end, false)
+        </code></pre>
+        <h2 id="ui">6. User Interface (`ui/index.html`)</h2>
+        <p>
+            A simple UI to display Valentine's Day gifts received by the player.
+        </p>
+        <pre><code class="language-html">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;Valentine's Day Gifts&lt;/title&gt;
+    &lt;link rel="stylesheet" href="style.css"&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="valentineUI"&gt;
+        &lt;h2&gt;Valentine's Day Gifts&lt;/h2&gt;
+        &lt;div id="giftsList"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;script src="script.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+        </code></pre>
+        <h2 id="ui-js">6.1 User Interface JavaScript (`ui/script.js`)</h2>
+        <p>
+            The `script.js` file listens for NUI messages from the FiveM client and updates the UI accordingly.
+        </p>
+        <pre><code class="language-javascript">
+window.addEventListener('message', function(event) {
+    if (event.data.action === 'displayGifts') {
+        let giftsContainer = document.getElementById('giftsList');
+        giftsContainer.innerHTML = "";
+        event.data.gifts.forEach(gift => {
+            giftsContainer.innerHTML += `<p><strong>${gift.gift}</strong>: ${gift.message}</p>`;
+        });
+    } else if (event.data.action === 'showNotification') {
+        alert(event.data.message);
+    }
+});
+        </code></pre>
+        <h2 id="setup">7. Setting Up</h2>
+        <p>
+            Follow these steps to set up the Valentine's event system:
+        </p>
+        <ul>
+            <li>Create a folder inside `resources/` named `valentines_event`.</li>
+            <li>Copy and paste the provided files into the folder.</li>
+            <li>Add this line to your `server.cfg`:</li>
+            <pre><code>start valentines_event</code></pre>
+            <li>Restart your FiveM server.</li>
+            <li>Use `/sendgift` to send a Valentine's gift.</li>
+        </ul>
+        <h2 id="conclusion">8. Conclusion</h2>
+        <p>
+            This lesson teaches a complete Valentine's Day Event System for FiveM.
+        </p>
+        <p>
+            ✅ Players can send & receive Valentine's gifts  
+            ✅ All interactions are stored in the database  
+            ✅ Expandable to include leaderboards & event tracking  
+        </p>
+        <p>
+            What would you like to add next? 🚀
+        </p>
+    </div>
+</body>
+</html>
+
+
